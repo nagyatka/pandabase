@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: nagyatka
- * Date: 16. 02. 28.
- * Time: 14:46
- */
 
 namespace PandaBase\Test;
 
