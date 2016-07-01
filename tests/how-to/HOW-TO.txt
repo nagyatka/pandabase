@@ -1,0 +1,9 @@
+
+TEST DATABASE
+-------------
+How to install test database: Use test_dump.sql from this directory.
+
+
+RUN TESTS
+---------
+How to run tests: vendor/bin/phpunit --bootstrap vendor/autoload.php tests/

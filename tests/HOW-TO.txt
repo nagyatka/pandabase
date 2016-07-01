@@ -1,9 +1,0 @@
-Teszt adatbázis telepítése:
-
-A teszt adatbázis ki van dumpolva a phppuli_test_db.sql fájlba. Ezt hozzáadva lehetséges a tesztek sikeres lefuttatása.
-
-Tesztek indítása:
-
-vendor/bin/phpunit --bootstrap vendor/autoload.php tests/
-
-(Az összes teszt osztályon végig megy.)
