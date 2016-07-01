@@ -140,4 +140,12 @@ class ConnectionConfiguration {
     {
         return $this->user;
     }
+
+    /**
+     * @return string
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
 } 

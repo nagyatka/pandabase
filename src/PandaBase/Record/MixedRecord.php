@@ -1,13 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: nagyatka
- * Date: 16. 01. 14.
- * Time: 22:21
- */
 
 namespace PandaBase\Record;
 
+
+use PandaBase\Connection\TableDescriptor;
 
 class MixedRecord extends DatabaseRecord {
 

@@ -10,6 +10,7 @@ namespace PandaBase\Record;
 
 
 use PandaBase\Connection\ConnectionManager;
+use PandaBase\Connection\TableDescriptor;
 use PandaBase\Exception\DatabaseManagerNotExists;
 
 abstract class RecordHandler {

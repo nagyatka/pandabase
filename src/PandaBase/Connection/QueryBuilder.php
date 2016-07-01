@@ -127,13 +127,12 @@ class QueryBuilder {
     }
 
     /**
-     * Returns with instance set.
-     *
-     * @return \PandaBase\Record\MixedRecordContainer
+     * @param $className
+     * @return \PandaBase\Record\InstanceRecordContainer
      */
-    public function getInstances() {
+    public function getInstances($className) {
         $this->buildSqlString();
-        return ConnectionManager::getInstance()->getMixedRecords($this->sql,$this->searchParameters);
+        return ConnectionManager::getInstance()->getInstanceRecords($className,$this->sql,$this->searchParameters);
     }
 
     /**

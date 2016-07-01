@@ -6,7 +6,7 @@
  * Time: 21:46
  */
 
-namespace PandaBase\Record;
+namespace PandaBase\Connection;
 
 
 use PandaBase\Exception\TableDescriptorNotExists;

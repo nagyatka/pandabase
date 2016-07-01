@@ -9,6 +9,8 @@
 namespace PandaBase\Record;
 
 
+use PandaBase\Connection\TableDescriptor;
+
 class SimpleRecord extends InstanceRecord {
 
     /**

@@ -3,6 +3,7 @@
 namespace PandaBase\Record;
 
 
+use PandaBase\Connection\TableDescriptor;
 use PandaBase\Exception\RecordValueNotExists;
 use PandaBase\Exception\TableDescriptorNotExists;
 

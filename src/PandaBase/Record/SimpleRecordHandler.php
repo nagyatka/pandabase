@@ -10,6 +10,7 @@ namespace PandaBase\Record;
 
 
 use PandaBase\Connection\ConnectionManager;
+use PandaBase\Connection\TableDescriptor;
 
 class SimpleRecordHandler extends RecordHandler {
 
