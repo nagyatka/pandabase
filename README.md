@@ -9,7 +9,7 @@ $ composer require nagyatka/pandabase
 ```
 
 ## Usage
-- [How to use Connection](Documentation/01-connection.md)
+- [How to use Connection](Documentation/01-connectionmanager.md)
 
 
 ## License

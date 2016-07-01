@@ -57,11 +57,19 @@ class ConnectionManager {
         return ConnectionManager::$connectionManagerInstance;
     }
 
+    /**
+     * Release all connection.
+     */
     public static function emptyConnections() {
         ConnectionManager::getInstance()->connectionInstances = [];
         ConnectionManager::getInstance()->defaultConnectionName = "";
     }
 
+    /**
+     * Initializes a connection with the parameters and adds it to manager object.
+     * @param array $config
+     * @throws ConnectionNotExistsException
+     */
     public function initializeConnection(array $config) {
         $configuration = ConnectionConfiguration::generateConfiguration($config);
         $numberOfConnection = count($this->connectionInstances);
@@ -70,6 +78,7 @@ class ConnectionManager {
     }
 
     /**
+     * Initializes more connections with the parameters and adds them to manager object.
      * @param array
      * @throws ConnectionNotExistsException
      */
