@@ -1,5 +1,6 @@
 #PandaBase
 
+Documentation is under development.
 
 ## Installation
 Install the latest version with
@@ -12,7 +13,7 @@ $ composer require nagyatka/pandabase
 
 Run queries:
 
-```bash
+```php
 use PandaBase\Connection\ConnectionManager;
 
 // Get the manager instance
@@ -23,12 +24,12 @@ $mixedRecords = $connectionManager->getMixedRecords("SELECT * FROM table1");
 
 // List the result
 $mixedRecords->foreachRecords(function (DatabaseRecord $record) {
-    echo $record->get("column_1").": ".$record->get("column_2");
+    echo $record->get("column_1").": ".$record->get("column_2")."\n";
 });
 ```
 
 Create a class based on database scheme using only inheritance:
-```bash
+```php
 
 use PandaBase\Connection\ConnectionManager;
 use PandaBase\Connection\TableDescriptor;
