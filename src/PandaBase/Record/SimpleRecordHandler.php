@@ -21,22 +21,21 @@ class SimpleRecordHandler extends RecordHandler {
     {
         $params = $this->databaseRecord->getAll();
         unset($params[$this->tableDescriptor->get(TableDescriptor::TABLE_ID)]);
-        unset($params["store_date"]);
         $params_key     =   array_keys($params);
 
         //Lekérdezés összeállítása
         $insert_query   =   "INSERT INTO"." ".$this->tableDescriptor->get(TableDescriptor::TABLE_NAME)." (";
         for($i = 0; $i < count($params_key); ++$i) {
-            $insert_query.= $params_key[$i].",";
+            $insert_query.= $params_key[$i];
+            if($i < (count($params_key)-1) ) $insert_query.=",";
         }
-        $insert_query .= " store_date";
         $insert_query .= ") VALUES (";
 
         for($i = 0; $i < count($params_key); ++$i) {
-            $insert_query.= ":".$params_key[$i].",";
+            $insert_query.= ":".$params_key[$i];
+            if($i < (count($params_key)-1) ) $insert_query.=",";
         }
-
-        $insert_query .= " NOW() )";
+        $insert_query.= ")";
 
         $prepared_statement = ConnectionManager::getInstance()->getConnection()->prepare($insert_query);
         for($i = 0; $i < count($params); ++$i) {

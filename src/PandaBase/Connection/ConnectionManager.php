@@ -158,7 +158,7 @@ class ConnectionManager {
         }
 
         if($instanceRecord->isNewInstance()) {
-            $insertId = $instanceRecord->getRecordHandler()->insert($instanceRecord->getAll());
+            $insertId = $instanceRecord->getRecordHandler()->insert();
             $instanceRecord[$instanceRecord->getTableDescriptor()->get(TABLE_ID)] = $insertId;
 
         }

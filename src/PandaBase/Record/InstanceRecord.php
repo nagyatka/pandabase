@@ -23,16 +23,26 @@ abstract class InstanceRecord extends DatabaseRecord {
         parent::__construct($descriptor, ($values == null) ? $this->getRecordHandler($descriptor)->select($id) : $values);
     }
 
+    /**
+     * @return bool
+     */
     public function isValid() {
         return count($this->values) == 0 ? false : true;
     }
 
+    /**
+     *
+     */
     public function remove() {
         $recordHandler = $this->getRecordHandler();
         $recordHandler->setManagedRecord($this);
         $recordHandler->remove();
     }
 
+    /**
+     * @return bool
+     * @throws \PandaBase\Exception\TableDescriptorNotExists
+     */
     public function isNewInstance() {
         return !isset($this->getAll()[$this->getTableDescriptor()->get(TABLE_ID)]);
     }
