@@ -1,0 +1,26 @@
+{
+    "name": "PandaBase",
+    "type": "library",
+    "description": "MySQL Database abstraction",
+    "keywords": ["mysql","pdo","abstraction"],
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Attila Nagy",
+            "email": "anagy@hit.bme.hu",
+            "role": "Author, Developer"
+        }
+    ],
+    "require": {
+        "monolog/monolog": "~1.12"
+    },
+    "autoload": {
+        "psr-0": {
+            "PandaBase": "src/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*",
+        "phpunit/dbunit": ">=1.2"
+    }
+}
