@@ -19,18 +19,11 @@ use PandaBase\Connection\ConnectionManager;
 $connectionManager = ConnectionManager::getInstance();
 
 // Get mixed result
-$mixedRecords = $connectionManager->getMixedRecords("
-  SELECT table1.val
-  FROM table1
-  JOIN table2 ON table1.id = table2.id
-  WHERE table1.val = :test_value
-",[
-    "test_value"    =>  "foo"
-]);
+$mixedRecords = $connectionManager->getMixedRecords("SELECT * FROM table1");
 
 // List the result
-$mixedRecords->foreachRecords(function (\PandaBase\Record\DatabaseRecord $record) {
-    echo $record->get("val");
+$mixedRecords->foreachRecords(function (DatabaseRecord $record) {
+    echo $record->get("column_1").": ".$record->get("column_2");
 });
 ```
 
@@ -62,8 +55,12 @@ echo $record->get("col1")
 
 ```
 
-## Usage
-- [How to use ConnectionManager](PandaBase/Documentation/01-connectionmanager.md)
+## Detailed Usage
+- [Principles](src/PandaBase/Documentation/principles.md)
+- [Initialize connection](src/PandaBase/Documentation/init-connection.md)
+- [Create classes based on database scheme](src/PandaBase/Documentation/create-classes.md)
+- [How to use the QueryBuilder](src/PandaBase/Documentation/query-builder.md)
+- [How to use the DatabaseContainer](src/PandaBase/Documentation/database-container.md)
 
 
 ## License
