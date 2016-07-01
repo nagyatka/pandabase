@@ -13,4 +13,4 @@ $ composer require nagyatka/pandabase
 
 
 ## License
-Apache 2.0
+PandaBase is licensed under the Apache 2.0 License
