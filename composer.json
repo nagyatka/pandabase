@@ -1,9 +1,10 @@
 {
-    "name": "PandaBase",
+    "name": "nagyatka/pandabase",
     "type": "library",
     "description": "MySQL Database abstraction",
     "keywords": ["mysql","pdo","abstraction"],
     "license": "Apache-2.0",
+    "homepage": "https://github.com/nagyatka/pandabase",
     "authors": [
         {
             "name": "Attila Nagy",
