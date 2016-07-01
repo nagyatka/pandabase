@@ -45,7 +45,7 @@ $mixedRecords->foreachRecords(function (\PandaBase\Record\DatabaseRecord $record
 });
 ```
 
-Create classes:
+Create a class based on database scheme using only inheritance:
 ```bash
 
 use PandaBase\Connection\ConnectionManager;
@@ -55,40 +55,26 @@ use PandaBase\Record\SimpleRecord;
 class TestRecord extends SimpleRecord {
 
     /**
-     * @var TableDescriptor
-     */
-    private static $tableDescriptor;
-
-    /**
      * @param int $id
      * @param null $values
      */
     function __construct($id, $values = null)
     {
-        TestRecord::$tableDescriptor = new TableDescriptor([
-            TABLE_NAME  =>  "table1",
-            TABLE_ID    =>  "id",
-        ]);
-        parent::__construct(TestRecord::$tableDescriptor, $id, $values);
+        parent::__construct(
+            new TableDescriptor(
+                [
+                    TABLE_NAME  =>  "table1",
+                    TABLE_ID    =>  "table_id"
+                ]),
+            $id,$values);
     }
 
 }
 
-// Get the manager instance
-$connectionManager = ConnectionManager::getInstance();
-
-// Add a connection to manager object
-$connectionManager->initializeConnection([
-    "name"      =>  "test_connection",  // Connection's name. You can use it for referring when you use more parallel connection
-    "driver"    =>  "mysql",            // Same as PDO parameter
-    "dbname"    =>  "test_dbname",      // Same as PDO parameter
-    "host"      =>  "127.0.0.1",        // Same as PDO parameter
-    "user"      =>  "root",             // Same as PDO parameter
-    "password"  =>  ""                  // Same as PDO parameter
-]);
-
 // Get a record from database with id=232
 $record = new TestRecord(232);
+
+echo $record->get("col1")
 
 ```
 
