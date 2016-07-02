@@ -10,7 +10,6 @@ HistoryableRecord.
 Assume that we have a MySQL table named as transactions and it has a primary key.
 
 ```mysql
-
 CREATE TABLE `database_name`.`transactions` (
 	`transaction_id` int(11) NOT NULL AUTO_INCREMENT,
 	`transaction_value` int(11),
@@ -18,15 +17,12 @@ CREATE TABLE `database_name`.`transactions` (
 	`store_date` datetime,
 	PRIMARY KEY (`transaction_id`)
 ) ENGINE=`InnoDB` COMMENT='';
-
 ```
 Implement Transaction class:
 ```php
-
 class Transaction extends SimpleRecord {
 
 }
-
 ```
 In next step you have to add a TableDescriptor to class which contains the name of the database and name of the primary key and
 you must overwrite the parent's constructor.
@@ -90,7 +86,6 @@ Assume that we have a MySQL table named as transactions and the table has the fo
 * history_to (datetime)
 
 ```mysql
-
 CREATE TABLE `database_name`.`transactions` (
     `transaction_sequence_id` int(11) NOT NULL AUTO_INCREMENT,
 	`transaction_id` int(11),
@@ -102,15 +97,12 @@ CREATE TABLE `database_name`.`transactions` (
 	`store_date` datetime,
 	PRIMARY KEY (`transaction_sequence_id`)
 ) ENGINE=`InnoDB` COMMENT='';
-
 ```
 Implement Transaction class:
 ```php
-
 class Transaction extends HistoryableRecord {
 
 }
-
 ```
 In next step you have to add a TableDescriptor to class which contains the name of the database and name of the primary key and
 you must overwrite the parent's constructor.
