@@ -59,13 +59,31 @@ $connection = $connectionManager->setDefault("test_connection2");
 $connection = $connectionManager->getConnection(); //test_connection2
 ```
 
-### Get result from default connection
+### Fetch result from default connection as MixedRecords
 ```php
 $mixedRecords = $connectionManager->getMixedRecords("SELECT * FROM table1");
 ```
 
-### Get result from a specified connection
+### Fetch result from a specified connection as MixedRecords
 ```php
 $mixedRecords = $connectionManager->getMixedRecords("SELECT * FROM table1",[],"test_connection2");
 ```
 
+# How to use Connection
+
+Connection object is a PDO wrapper and provide
+
+### Get connection
+```php
+$connection = $connectionManager->getConnection();
+```
+
+### Fetch a result row as an associative array
+```php
+$result = $connection->fetchAssoc("SELECT * FROM table1 WHERE id = :id",["id" => $id]);
+```
+
+### Returns an array containing all of the result set rows as an associative array
+```php
+$result = $connection->fetchAll("SELECT * FROM table1",[]);
+```
