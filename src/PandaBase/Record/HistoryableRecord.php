@@ -3,6 +3,8 @@
 namespace PandaBase\Record;
 
 
+use PandaBase\Connection\TableDescriptor;
+
 class HistoryableRecord extends InstanceRecord {
     /**
      * @param $key

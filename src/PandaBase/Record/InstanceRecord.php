@@ -12,6 +12,8 @@ namespace PandaBase\Record;
 
 use PandaBase\Connection\TableDescriptor;
 
+define("CREATE_INSTANCE",0);
+
 abstract class InstanceRecord extends DatabaseRecord {
 
     /**

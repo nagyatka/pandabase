@@ -13,13 +13,11 @@ class TestRecord extends SimpleRecord {
      */
     function __construct($id, $values = null)
     {
-        parent::__construct(
-            new TableDescriptor(
-                [
-                    TABLE_NAME  =>  "pp_simple_table",
-                    TABLE_ID    =>  "table_id"
-                ]),
-            $id,$values);
+        $tableDescriptor = new TableDescriptor([
+            TABLE_NAME  =>  "pp_simple_table",
+            TABLE_ID    =>  "table_id",
+        ]);
+        parent::__construct($tableDescriptor,$id,$values);
     }
 
 } 

@@ -116,7 +116,7 @@ class ConnectionManagerTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testPersistNew() {
-        $newRecord = new TestRecord(0,[
+        $newRecord = new TestRecord(CREATE_INSTANCE,[
             "table_col_1"   =>  "add_record",
             "store_date"    =>  date('Y-m-d H:i:s')
         ]);

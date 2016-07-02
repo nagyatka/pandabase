@@ -21,6 +21,30 @@ echo $record["column_1"];
 
 ### Difference between MixedRecord and InstanceRecord
 
-You have to use MixedRecords when you have a query which contains columns of more table. Conversely, an InstanceRecord
-can interpreted as row of one table, thus you can use it when you write only simple queries which use one table from database.
-Because every InstanceRecord is a row in a table, you can save modification or remove it from the table.
+You have to use MixedRecords when you have a query which contains columns of more table. Conversely, an InstanceRecord can
+interpreted as row of one table, thus you can use it when you write only simple queries which use one table from database.
+Because every InstanceRecord is a row in a table, you can save modification or remove it from the table. You are not able to
+do this in case of MixedRecords.
+
+#### MixedRecord example
+
+```php
+$mixedRecords = $connectionManager->getMixedRecords("SELECT * FROM table1 LEFT JOIN table2 USING (id)");
+
+$mixedRecords->foreachRecords(function (DatabaseRecord $record) {
+    echo $record->get("column_1").": ".$record->get("column_2")."\n";
+});
+```
+
+
+#### InstanceRecord example
+
+```php
+$instanceRecords = $connectionManager->getInstanceRecords(Table1::class,"SELECT * FROM table1 WHERE column_1 < 10");
+
+$instanceRecords->foreachRecords(function (DatabaseRecord $record) {
+    $record->set("column_1",10);
+});
+
+$connectionManager->persistAll($instanceRecords);
+```
