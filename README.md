@@ -58,7 +58,7 @@ echo $record->get("col1")
 
 ## Detailed Usage
 - [Principles](src/PandaBase/Documentation/v1.0/principles.md)
-- [Initialize connection](src/PandaBase/Documentation/v1.0/init-connection.md)
+- [How to use ConnectionManager](src/PandaBase/Documentation/v1.0/init-connection.md)
 - [Create classes based on database scheme](src/PandaBase/Documentation/v1.0/create-classes.md)
 - [How to use the QueryBuilder](src/PandaBase/Documentation/v1.0/query-builder.md)
 - [How to use the DatabaseContainer](src/PandaBase/Documentation/v1.0/database-container.md)

@@ -1,4 +1,4 @@
-# Manage connections
+# How to use ConnectionManager
 
 ### Get ConnectionManager instance
 
@@ -43,12 +43,12 @@ $connectionManager->initializeConnection(
 );
 ```
 
-### Get the connection
+### Get connection
 ```php
 $connection = $connectionManager->getConnection();
 ```
 
-### Get the connection by name
+### Get connection by name
 ```php
 $connection = $connectionManager->getConnection("test_connection2");
 ```
@@ -58,3 +58,14 @@ $connection = $connectionManager->getConnection("test_connection2");
 $connection = $connectionManager->setDefault("test_connection2");
 $connection = $connectionManager->getConnection(); //test_connection2
 ```
+
+### Get result from default connection
+```php
+$mixedRecords = $connectionManager->getMixedRecords("SELECT * FROM table1");
+```
+
+### Get result from a specified connection
+```php
+$mixedRecords = $connectionManager->getMixedRecords("SELECT * FROM table1",[],"test_connection2");
+```
+
