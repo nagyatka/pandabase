@@ -13,10 +13,10 @@ class ConnectionNotExistsException extends \Exception{
 
     /**
      * ConnectionNotExistsException constructor.
-     * @param string $connectionName
+     * @param string $className
      */
-    public function __construct($connectionName)
+    public function __construct($className)
     {
-        parent::__construct("Connection (named as ".$connectionName.") does not exists!", 0, null);
+        parent::__construct("Connection (named as ".$className.") does not exists!", 0, null);
     }
 } 

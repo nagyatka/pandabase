@@ -7,11 +7,13 @@ use PDO;
 
 /**
  * Class Connection
+ * PDO wrapper class.
  * @package PandaBase\Connection
  */
 class Connection {
 
     /**
+     * PHP PDO object.
      * @var PDO
      */
     private $database;
@@ -117,6 +119,13 @@ class Connection {
     public function getConnectionConfiguration()
     {
         return $this->connectionConfiguration;
+    }
+
+    /**
+     * Release connection.
+     */
+    public function release() {
+        $this->database = null;
     }
 
 

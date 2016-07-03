@@ -1,7 +1,7 @@
 # How to use ConnectionManager
 
 ### Get ConnectionManager instance
-
+You can reach the ConnectionManager instance globally via `getInstance()` method
 ```php
 $connectionManager = ConnectionManager::getInstance();
 ```
@@ -20,7 +20,7 @@ $connectionManager->initializeConnection([
 
 ### Add more connection to manager object
 ```php
-$connectionManager->initializeConnection(
+$connectionManager->initializeConnections(
     [
         [
             "name"      =>  "test_connection1", // Connection's name. You can use it for referring when you use more parallel connection
@@ -71,7 +71,7 @@ $mixedRecords = $connectionManager->getMixedRecords("SELECT * FROM table1",[],"t
 
 # How to use Connection
 
-Connection object is a PDO wrapper and provide
+Connection is a PDO wrapper (all PDO function is callable) and provides a modified fetchAssoc and fetchAll methods.
 
 ### Get connection
 ```php

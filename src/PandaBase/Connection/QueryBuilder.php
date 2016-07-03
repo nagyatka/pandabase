@@ -60,6 +60,7 @@ class QueryBuilder {
     private $groupBy;
 
     /**
+     * QueryBuilder constructor.
      * @param string $sql
      * @param array $parameterList
      */
