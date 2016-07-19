@@ -223,4 +223,11 @@ class DatabaseRecordContainer implements \ArrayAccess, \Countable {
     {
         return $this->size();
     }
+
+    /**
+     * @return DatabaseRecord[]
+     */
+    public function getRecords() {
+        return $this->records;
+    }
 }
