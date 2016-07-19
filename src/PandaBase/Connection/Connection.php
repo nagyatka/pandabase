@@ -128,5 +128,12 @@ class Connection {
         $this->database = null;
     }
 
+    /**
+     * Set names to utf8.
+     */
+    public function setNamesUTF8() {
+        $this->database->query("SET NAMES utf8");
+    }
+
 
 }
