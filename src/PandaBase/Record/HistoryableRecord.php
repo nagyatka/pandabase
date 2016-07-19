@@ -56,7 +56,7 @@ class HistoryableRecord extends InstanceRecord {
             WHERE ".$tableDescriptor->get(TABLE_ID)."=:".$tableDescriptor->get(TABLE_ID);
 
         if($from != null && $to != null) {
-            $sql = " AND (history_from BETWEEN :from_date AND :to_date) AND ((history_to BETWEEN :from_date AND :to_date) OR history_to IS NULL) ";
+            $sql = " AND (history_from BETWEEN :from_date AND :to_date) AND (history_to BETWEEN :from_date AND :to_date) ";
         }
 
         $sql .= "ORDER BY ".$tableDescriptor->get(TABLE_SEQ_ID)." DESC";
@@ -67,11 +67,24 @@ class HistoryableRecord extends InstanceRecord {
             ]);
     }
 
+    /**
+     * @param string $date Date string.
+     * @return int
+     * @throws \PandaBase\Exception\ConnectionNotExistsException
+     * @throws \PandaBase\Exception\RecordValueNotExists
+     * @throws \PandaBase\Exception\TableDescriptorNotExists
+     */
+    protected function getHistoryAtDateInternal($date) {
+        $tableDescriptor = $this->getTableDescriptor();
+        $sql = "SELECT ".$tableDescriptor->get(TABLE_ID)." FROM ".$tableDescriptor->get(TABLE_NAME)." 
+            WHERE ".$tableDescriptor->get(TABLE_ID)."=:".$tableDescriptor->get(TABLE_ID)." AND :history_date >= history_from AND :history_date <= history_to";
 
-    public function getHistoryAtDate($date) {
-        //TODO: Implement
+        $result = ConnectionManager::getInstance()->getDefault()->fetchAssoc($sql,[
+            $tableDescriptor->get(TABLE_ID) => $this->get($tableDescriptor->get(TABLE_ID)),
+            "history_date"                  => $date
+        ]);
 
-        throw new Exception("Not yet implemented.");
+        return intval($result[$tableDescriptor->get(TABLE_ID)]);
     }
 
 } 

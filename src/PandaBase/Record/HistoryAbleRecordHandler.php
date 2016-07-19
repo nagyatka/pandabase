@@ -10,6 +10,7 @@ namespace PandaBase\Record;
 
 
 use PandaBase\Connection\ConnectionManager;
+use PandaBase\Connection\TableDescriptor;
 use PandaBase\Exception\DatabaseManagerNotExists;
 use PandaBase\Exception\RecordValueNotExists;
 use PandaBase\Exception\TableDescriptorNotExists;
@@ -25,6 +26,7 @@ class HistoryAbleRecordHandler extends RecordHandler{
         //Felesleges elemek törlése (seq_id,record_status,history,from)
         unset($params[$this->tableDescriptor->get(TableDescriptor::TABLE_SEQ_ID)]);
         unset($params["history_from"]);
+        unset($params["history_to"]);
 
         //Tartalmaz-e rec_status-t
         $containsTableId = array_key_exists($this->tableDescriptor->get(TableDescriptor::TABLE_ID),$params);
@@ -35,12 +37,12 @@ class HistoryAbleRecordHandler extends RecordHandler{
         for($i = 0; $i < count($params_key); ++$i) {
             $insert_query.= "`".$params_key[$i]."`,";
         }
-        $insert_query.="record_status,history_from) VALUES (";
+        $insert_query.="record_status,history_from,history_to) VALUES (";
 
         for($i = 0; $i < count($params_key); ++$i) {
             $insert_query.= ":".$params_key[$i].",";
         }
-        $insert_query   .=  "1,NOW())";
+        $insert_query   .=  "1,NOW(),'9999-12-31 00:00:00')";
 
 
         $prepared_statement = ConnectionManager::getInstance()->getConnection()->prepare($insert_query);
@@ -95,7 +97,7 @@ class HistoryAbleRecordHandler extends RecordHandler{
     {
         if(array_key_exists($this->tableDescriptor->get(TableDescriptor::TABLE_ID),$this->databaseRecord->getAll())) {
             $this->remove();
-            $this->insert($this->databaseRecord->getAll());
+            $this->insert();
         }
         else {
             throw new RecordValueNotExists("Table id not exists in array");
@@ -110,7 +112,7 @@ class HistoryAbleRecordHandler extends RecordHandler{
      */
     public function remove()
     {
-        $remove_query   = "UPDATE ".$this->tableDescriptor->get(TableDescriptor::TABLE_NAME)." SET rec_status = 0, history_to = NOW() WHERE ".$this->tableDescriptor->get(TableDescriptor::TABLE_ID)."=:".$this->tableDescriptor->get(TableDescriptor::TABLE_ID)." AND rec_status=1";
+        $remove_query   = "UPDATE ".$this->tableDescriptor->get(TableDescriptor::TABLE_NAME)." SET record_status = 0, history_to = NOW() WHERE ".$this->tableDescriptor->get(TableDescriptor::TABLE_ID)."=:".$this->tableDescriptor->get(TableDescriptor::TABLE_ID)." AND record_status=1";
         $prepared_statement = ConnectionManager::getInstance()->getConnection()->prepare($remove_query);
         $prepared_statement->bindValue($this->tableDescriptor->get(TableDescriptor::TABLE_ID),$this->databaseRecord->get($this->tableDescriptor->get(TableDescriptor::TABLE_ID)));
         $prepared_statement->execute();
