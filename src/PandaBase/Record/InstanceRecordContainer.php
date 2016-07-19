@@ -11,4 +11,16 @@ namespace PandaBase\Record;
 
 class InstanceRecordContainer extends DatabaseRecordContainer {
 
+    private $className;
+
+    /**
+     * InstanceRecordContainer constructor.
+     * @param string $className
+     * @param DatabaseRecord[] $records
+     */
+    public function __construct($className,$records)
+    {
+        $this->className = $className;
+        parent::__construct($records);
+    }
 } 
