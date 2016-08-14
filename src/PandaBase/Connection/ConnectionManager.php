@@ -9,6 +9,8 @@
 namespace PandaBase\Connection;
 
 
+use PandaBase\AccessManagement\AccessManager;
+use PandaBase\AccessManagement\AccessUserInterface;
 use PandaBase\Exception\ConnectionNotExistsException;
 use PandaBase\Exception\NotInstanceRecord;
 use PandaBase\Record\InstanceRecord;
@@ -45,10 +47,16 @@ class ConnectionManager {
     private $defaultConnectionName;
 
     /**
+     * @var AccessManager
+     */
+    private $accessManager;
+
+    /**
      * ConnectionManager constructor.
      */
     private function __construct() {
         $this->connectionInstances = [];
+        $this->accessManager = new AccessManager();
     }
 
     /**
@@ -216,7 +224,7 @@ class ConnectionManager {
         foreach ($query_result as $result) {
             $records[] = new $class_name(0,$result);
         }
-        return new InstanceRecordContainer($records);
+        return new InstanceRecordContainer($class_name,$records);
     }
 
     /**
@@ -258,5 +266,19 @@ class ConnectionManager {
         $instanceRecordContainer->foreachRecords(function($record) use($connectionName) {
             $this->persist($record,$connectionName);
         });
+    }
+
+    /**
+     * @param AccessUserInterface $accessUser
+     */
+    public function registerAccessUser(AccessUserInterface $accessUser) {
+        $this->accessManager->registerAccessUser($accessUser);
+    }
+
+    /**
+     * @return AccessManager
+     */
+    public function getAccessManager() {
+        return $this->accessManager;
     }
 } 

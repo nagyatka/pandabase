@@ -3,7 +3,10 @@
 namespace PandaBase\Record;
 
 
+use PandaBase\AccessManagement\AccessibleObject;
+use PandaBase\Connection\ConnectionManager;
 use PandaBase\Connection\TableDescriptor;
+use PandaBase\Exception\AccessDeniedException;
 use PandaBase\Exception\RecordValueNotExists;
 use PandaBase\Exception\TableDescriptorNotExists;
 
@@ -60,13 +63,23 @@ abstract class DatabaseRecord implements \ArrayAccess {
     /**
      * @param $key
      * @return mixed
-     * @throws TableDescriptorNotExists
+     * @throws AccessDeniedException
      * @throws RecordValueNotExists
      */
     public function get($key) {
         if(!isset($this->values[$key])) {
             throw new RecordValueNotExists("Value ".$key." not exists in ".$this->getTableDescriptor()->get(TableDescriptor::TABLE_NAME));
         }
+
+        // Ha van beállítva jogosultság, akkor ellenőrizni kell
+        if(in_array(AccessibleObject::class,class_uses($this))) {
+            /** @var AccessibleObject $object */
+            $object = $this;
+            if(!ConnectionManager::getInstance()->getAccessManager()->checkReadAccess($object)) {
+                throw new AccessDeniedException;
+            }
+        }
+
         return $this->values[$key];
     }
 
