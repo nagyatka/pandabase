@@ -21,5 +21,11 @@ interface AccessUserInterface
      * Az aktuális felhasználó egyedi azonosítója.
      * @return int
      */
-    public function getUserId();
+    public function getAccessUserId();
+
+    /**
+     * Azonosító tömb.
+     * @return array
+     */
+    public function getGroups();
 }

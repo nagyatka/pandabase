@@ -20,6 +20,11 @@ trait AccessibleObject
     abstract public function getOwnerId();
 
     /**
+     * @return int
+     */
+    abstract public function getOwnerGroupId();
+
+    /**
      * @param string $user_type
      * @return string
      */
@@ -28,18 +33,30 @@ trait AccessibleObject
     }
 
     /**
+     * [owner]:[group]:[other]:[anon]
      *
-     * rw:r
+     * pl.:
+     * Tulajdonos írhat és olvashat, többi user olvashat --> rw:r:r:
      * @param string $rules
      */
     public function setAccessRules($rules) {
+
         $parts = explode(":",$rules);
+        //Ha nincs elég rész, akkor hibát dobunk
+        if(count($parts) != 4) {
+            throw new \InvalidArgumentException("You must provide [owner]:[group]:[other]:[anon] access rules.");
+        }
+
         $rules[AccessManager::OWNER_USER][AccessManager::TYPE_READ] = strpos($parts[0],"r") ? true : false;
         $rules[AccessManager::OWNER_USER][AccessManager::TYPE_WRITE] = strpos($parts[0],"w") ? true : false;
 
-        if(isset($parts[1])) {
-            $rules[AccessManager::OTHER_USER][AccessManager::TYPE_READ] = strpos($parts[1],"r") ? true : false;
-            $rules[AccessManager::OTHER_USER][AccessManager::TYPE_WRITE] = strpos($parts[1],"w") ? true : false;
-        }
+        $rules[AccessManager::GROUP_USER][AccessManager::TYPE_READ] = strpos($parts[1],"r") ? true : false;
+        $rules[AccessManager::GROUP_USER][AccessManager::TYPE_WRITE] = strpos($parts[1],"w") ? true : false;
+
+        $rules[AccessManager::OTHER_USER][AccessManager::TYPE_READ] = strpos($parts[2],"r") ? true : false;
+        $rules[AccessManager::OTHER_USER][AccessManager::TYPE_WRITE] = strpos($parts[2],"w") ? true : false;
+
+        $rules[AccessManager::ANON_USER][AccessManager::TYPE_READ] = strpos($parts[3],"r") ? true : false;
+        $rules[AccessManager::ANON_USER][AccessManager::TYPE_WRITE] = strpos($parts[3],"w") ? true : false;
     }
 }

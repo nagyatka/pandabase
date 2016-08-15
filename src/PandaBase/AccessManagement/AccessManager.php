@@ -15,8 +15,9 @@ class AccessManager
     const TYPE_WRITE= 2;
 
     const OWNER_USER = "owner";
+    const GROUP_USER = "group";
     const OTHER_USER = "other";
-
+    const ANON_USER  = "anon";
     /**
      * @var null|AccessUserInterface
      */
@@ -50,17 +51,25 @@ class AccessManager
      * @return bool
      */
     private function checkAccess(AccessibleObject $object,$access_type) {
-        //Ha nincs user, akkor semmiképpen nem biztosítunk hozzáférést
+
+        //Ha nincs beállított user, akkor anonym hozzáférés
         if($this->accessUser == null) {
-            return false;
+            return $object->getAccessRules(AccessManager::ANON_USER)[$access_type];
         }
+
         //Ha root, akkor mindig kap mindenre jogot
         if ($this->accessUser->isRoot()) {
             return true;
         }
-        if($this->accessUser->getUserId() === $object->getOwnerId()) {
+        //Ha owner
+        elseif($this->accessUser->getUserId() === $object->getOwnerId()) {
             return $object->getAccessRules(AccessManager::OWNER_USER)[$access_type];
-        } else {
+        }
+        //Ha csoport tag
+        elseif (in_array($object->getOwnerGroupId(),$this->accessUser->getGroups())) {
+            return $object->getAccessRules(AccessManager::GROUP_USER)[$access_type];
+        }
+        else {
             return $object->getAccessRules(AccessManager::OTHER_USER)[$access_type];
         }
     }
