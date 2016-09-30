@@ -249,8 +249,9 @@ class ConnectionManager {
             $insertId = $instanceRecord->getRecordHandler()->insert();
             $instanceRecord[$instanceRecord->getTableDescriptor()->get(TABLE_ID)] = $insertId;
 
+        } else {
+            $instanceRecord->getRecordHandler()->edit();
         }
-        $instanceRecord->getRecordHandler()->edit();
 
         $this->defaultConnectionName = $prevConnectionName;
     }
