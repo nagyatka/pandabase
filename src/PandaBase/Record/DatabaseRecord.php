@@ -110,7 +110,7 @@ abstract class DatabaseRecord implements \ArrayAccess {
      */
     public function offsetExists($offset)
     {
-        return isset($this->values[$offset]);
+        return array_key_exists($offset,$this->values);
     }
 
     /**
