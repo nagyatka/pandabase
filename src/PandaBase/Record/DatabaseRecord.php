@@ -64,11 +64,11 @@ abstract class DatabaseRecord implements \ArrayAccess {
      * @param $key
      * @return mixed
      * @throws AccessDeniedException
-     * @throws RecordValueNotExists
      */
     public function get($key) {
         if(!isset($this->values[$key])) {
-            throw new RecordValueNotExists("Value ".$key." not exists in ".$this->getTableDescriptor()->get(TableDescriptor::TABLE_NAME));
+            //throw new RecordValueNotExists("Value ".$key." not exists in ".$this->getTableDescriptor()->get(TableDescriptor::TABLE_NAME));
+            return null;
         }
 
         // Ha van beállítva jogosultság, akkor ellenőrizni kell
@@ -120,13 +120,12 @@ abstract class DatabaseRecord implements \ArrayAccess {
      * @param mixed $offset <p>
      * The offset to retrieve.
      * </p>
-     * @throws RecordValueNotExists
      * @return mixed Can return all value types.
      */
     public function offsetGet($offset)
     {
         if(!$this->offsetExists($offset)) {
-            throw new RecordValueNotExists();
+            return null;
         }
         return $this->values[$offset];
     }
