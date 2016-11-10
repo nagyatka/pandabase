@@ -27,6 +27,7 @@ class HistoryAbleRecordHandler extends RecordHandler{
         unset($params[$this->tableDescriptor->get(TableDescriptor::TABLE_SEQ_ID)]);
         unset($params["history_from"]);
         unset($params["history_to"]);
+        unset($params["record_status"]);
 
         //Tartalmaz-e rec_status-t
         $containsTableId = array_key_exists($this->tableDescriptor->get(TableDescriptor::TABLE_ID),$params);
