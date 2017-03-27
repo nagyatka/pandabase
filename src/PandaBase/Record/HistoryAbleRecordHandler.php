@@ -81,6 +81,9 @@ class HistoryAbleRecordHandler extends RecordHandler{
      */
     public function select($id)
     {
+        if($id == 0) {
+            return array();
+        }
         $select_query   = "SELECT * FROM"." ".$this->tableDescriptor->get(TableDescriptor::TABLE_NAME)." WHERE record_status = 1 AND ".$this->tableDescriptor->get(TableDescriptor::TABLE_ID)."=:".$this->tableDescriptor->get(TableDescriptor::TABLE_ID);
         $params         = array(
             $this->tableDescriptor->get(TableDescriptor::TABLE_ID) => $id
