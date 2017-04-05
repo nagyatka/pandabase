@@ -25,6 +25,7 @@ use PandaBase\Record\MixedRecordContainer;
  * @package PandaBase\Connection
  */
 class ConnectionManager {
+
     /**
      * Singleton instance
      *
@@ -93,8 +94,7 @@ class ConnectionManager {
     }
 
     /**
-     * Release all connection.
-     *
+     * It releases all connection.
      */
     public function releaseConnections() {
         foreach ($this->getAllConnection() as $connection) {
@@ -112,9 +112,9 @@ class ConnectionManager {
      */
     public function initializeConnection(array $config) {
         $configuration = ConnectionConfiguration::generateConfiguration($config);
-        $numberOfConnection = count($this->connectionInstances);
+        $numberOfActiveConnection = count($this->connectionInstances);
         $this->connectionInstances[$configuration->getName()] = new Connection($configuration);
-        if($numberOfConnection == 0) $this->setDefault($configuration->getName());
+        if($numberOfActiveConnection == 0) $this->setDefault($configuration->getName());
     }
 
     /**

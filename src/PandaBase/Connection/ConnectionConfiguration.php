@@ -48,10 +48,16 @@ class ConnectionConfiguration {
     private $driver;
 
     /**
+     * PDO attributes
+     * @var array
+     */
+    private $pdoAttributes;
+
+    /**
      * List of supported drivers.
      * @var array
      */
-    private $supportedDrivers = ["mysql"];
+    private $supportedDrivers = ["mysql","mssql"];
 
     /**
      * Constructor.
@@ -64,9 +70,10 @@ class ConnectionConfiguration {
      * @param $name string Name of the connection.
      * @param $password string Database password
      * @param $user string Database username
+     * @param array $pdoAttributes
      * @throws \Exception
      */
-    function __construct($dbname, $driver, $host, $name, $password, $user)
+    function __construct($dbname, $driver, $host, $name, $password, $user, $pdoAttributes = null)
     {
         if(!in_array($driver,$this->supportedDrivers))
             throw new \Exception("Unsupported PDO driver. List of supported drivers:".implode(",",$this->supportedDrivers));
@@ -78,6 +85,7 @@ class ConnectionConfiguration {
         $this->name = $name;
         $this->password = $password;
         $this->user = $user;
+        $this->pdoAttributes = $pdoAttributes;
     }
 
     /**
@@ -92,7 +100,8 @@ class ConnectionConfiguration {
             $configArray["host"],
             $configArray["name"],
             $configArray["password"],
-            $configArray["user"]
+            $configArray["user"],
+            $configArray["attributes"]
         );
     }
 
@@ -148,4 +157,22 @@ class ConnectionConfiguration {
     {
         return $this->password;
     }
+
+    /**
+     * @return array
+     */
+    public function getPdoAttributes()
+    {
+        return $this->pdoAttributes;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSupportedDrivers()
+    {
+        return $this->supportedDrivers;
+    }
+
+
 } 

@@ -30,8 +30,23 @@ class Connection {
      */
     public function __construct(ConnectionConfiguration $configuration) {
         $this->connectionConfiguration = $configuration;
-        $pdoString = 'mysql:host='.$this->connectionConfiguration->getHost().";port=3306;dbname=".$this->connectionConfiguration->getDbname();
+        $pdoString = Connection::pdoDsnFactory($configuration);
         $this->database = new PDO($pdoString, $this->connectionConfiguration->getUser(), $this->connectionConfiguration->getPassword());
+    }
+
+    /**
+     * @param ConnectionConfiguration $configuration
+     * @return string
+     */
+    private static function pdoDsnFactory(ConnectionConfiguration $configuration) {
+        switch ($configuration->getDriver()) {
+            case "mysql":
+                return 'mysql:host='.$configuration->getHost().";port=3306;dbname=".$configuration->getDbname();
+            case "mssql":
+                return 'sqlsrv:Server='.$configuration->getHost().';Database='.$configuration->getDbname();
+            default:
+                throw new \PDOException("Unknown PDO driver!");
+        }
     }
 
     /**
