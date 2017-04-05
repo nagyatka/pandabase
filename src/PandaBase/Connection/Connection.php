@@ -32,6 +32,12 @@ class Connection {
         $this->connectionConfiguration = $configuration;
         $pdoString = Connection::pdoDsnFactory($configuration);
         $this->database = new PDO($pdoString, $this->connectionConfiguration->getUser(), $this->connectionConfiguration->getPassword());
+
+        $pdoAttributes = $configuration->getPdoAttributes();
+        foreach ($pdoAttributes as $attributeName => $attributeValue) {
+            $this->database->setAttribute($attributeName,$attributeValue);
+        }
+
     }
 
     /**
