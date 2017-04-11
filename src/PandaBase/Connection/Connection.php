@@ -34,8 +34,10 @@ class Connection {
         $this->database = new PDO($pdoString, $this->connectionConfiguration->getUser(), $this->connectionConfiguration->getPassword());
 
         $pdoAttributes = $configuration->getPdoAttributes();
-        foreach ($pdoAttributes as $attributeName => $attributeValue) {
-            $this->database->setAttribute($attributeName,$attributeValue);
+        if($pdoAttributes) {
+            foreach ($pdoAttributes as $attributeName => $attributeValue) {
+                $this->database->setAttribute($attributeName,$attributeValue);
+            }
         }
 
     }
