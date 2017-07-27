@@ -3,18 +3,17 @@
 namespace PandaBase\Record;
 
 
-use Exception;
 use PandaBase\AccessManagement\AccessibleObject;
-use PandaBase\Connection\ConnectionConfiguration;
 use PandaBase\Connection\ConnectionManager;
-use PandaBase\Connection\TableDescriptor;
+use PandaBase\Connection\Scheme\Table;
 use PandaBase\Exception\AccessDeniedException;
 
 class HistoryableRecord extends InstanceRecord {
+
     /**
      * @param $key
      * @param $value
-     * @return mixed
+     * @return void
      * @throws AccessDeniedException
      */
     public function set($key, $value)
@@ -31,50 +30,50 @@ class HistoryableRecord extends InstanceRecord {
     }
 
     /**
-     * @param TableDescriptor $tableDescriptor
+     * @param Table $tableDescriptor
      * @return RecordHandler
      */
-    public function getRecordHandler(TableDescriptor $tableDescriptor = null)
+    public function getRecordHandler(Table $tableDescriptor = null): RecordHandler
     {
         if($tableDescriptor == null) {
-            $simpleHandler = new HistoryAbleRecordHandler($this->getTableDescriptor());
+            $simpleHandler = new HistoryableRecordHandler($this->getTableDescriptor());
             $simpleHandler->setManagedRecord($this);
             return $simpleHandler;
         } else {
-            return new HistoryAbleRecordHandler($tableDescriptor);
+            return new HistoryableRecordHandler($tableDescriptor);
         }
     }
 
-
     /**
-     * @return InstanceRecordContainer
+     * @return array
      */
     public function getHistory() {
         return $this->getHistoryBetweenDates();
     }
 
     /**
-     * @param null $from
-     * @param null $to
-     * @return InstanceRecordContainer
+     * @param string $from
+     * @param string $to
+     * @return array
      * @throws \PandaBase\Exception\RecordValueNotExists
      * @throws \PandaBase\Exception\TableDescriptorNotExists
      */
     public function getHistoryBetweenDates($from = null ,$to = null) {
         $tableDescriptor = $this->getTableDescriptor();
 
-        $sql = "SELECT * FROM ".$tableDescriptor->get(TABLE_NAME)." 
-            WHERE ".$tableDescriptor->get(TABLE_ID)."=:".$tableDescriptor->get(TABLE_ID);
+        $sql =
+            "SELECT * FROM ".$tableDescriptor->get(Table::TABLE_NAME)." ".
+            "WHERE ".$tableDescriptor->get(Table::TABLE_ID)."=:".$tableDescriptor->get(Table::TABLE_ID);
 
         if($from != null && $to != null) {
             $sql = " AND (history_from BETWEEN :from_date AND :to_date) AND (history_to BETWEEN :from_date AND :to_date) ";
         }
 
-        $sql .= "ORDER BY ".$tableDescriptor->get(TABLE_SEQ_ID)." DESC";
+        $sql .= "ORDER BY ".$tableDescriptor->get(Table::TABLE_SEQ_ID)." DESC";
 
-        return ConnectionManager::getInstance()->getInstanceRecords(self::class,
+        return ConnectionManager::getInstanceRecords(self::class,
                 $sql,[
-                $tableDescriptor->get(TABLE_ID) => $this->get($tableDescriptor->get(TABLE_ID))
+                $tableDescriptor->get(Table::TABLE_ID) => $this->get($tableDescriptor->get(Table::TABLE_ID))
             ]);
     }
 
@@ -87,15 +86,19 @@ class HistoryableRecord extends InstanceRecord {
      */
     protected function getHistoryAtDateInternal($date) {
         $tableDescriptor = $this->getTableDescriptor();
-        $sql = "SELECT ".$tableDescriptor->get(TABLE_ID)." FROM ".$tableDescriptor->get(TABLE_NAME)." 
-            WHERE ".$tableDescriptor->get(TABLE_ID)."=:".$tableDescriptor->get(TABLE_ID)." AND :history_date >= history_from AND :history_date <= history_to";
+        $sql =
+            "SELECT ".$tableDescriptor->get(Table::TABLE_ID)." ".
+            "FROM ".  $tableDescriptor->get(Table::TABLE_NAME)." ".
+            "WHERE ". $tableDescriptor->get(Table::TABLE_ID)."=:".$tableDescriptor->get(Table::TABLE_ID)." AND :history_date >= history_from AND :history_date <= history_to";
 
-        $result = ConnectionManager::getInstance()->getDefault()->fetchAssoc($sql,[
-            $tableDescriptor->get(TABLE_ID) => $this->get($tableDescriptor->get(TABLE_ID)),
-            "history_date"                  => $date
-        ]);
+        $result = ConnectionManager::getInstance()
+            ->getDefault()
+            ->fetchAssoc($sql,[
+                $tableDescriptor->get(Table::TABLE_ID)    => $this->get($tableDescriptor->get(Table::TABLE_ID)),
+                "history_date"                                      => $date
+            ]);
 
-        return intval($result[$tableDescriptor->get(TABLE_ID)]);
+        return intval($result[$tableDescriptor->get(Table::TABLE_ID)]);
     }
 
 } 

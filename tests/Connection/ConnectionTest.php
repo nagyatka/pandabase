@@ -1,20 +1,14 @@
 <?php
-use PandaBase\Connection\Connection;
+use PandaBase\Connection\{Connection,ConnectionConfiguration};
+use PHPUnit\Framework\TestCase;
 
-/**
- * Created by PhpStorm.
- * User: nagyatka
- * Date: 16. 02. 27.
- * Time: 15:39
- */
-
-class ConnectionTest extends PHPUnit_Framework_TestCase {
+class ConnectionTest extends TestCase  {
 
     private $connection;
 
     public function __construct() {
-        $this->connection = new \PandaBase\Connection\Connection(
-            \PandaBase\Connection\ConnectionConfiguration::generateConfiguration([
+        $this->connection = new Connection(
+            ConnectionConfiguration::generateConfiguration([
                 "name"      =>  "test_connection",
                 "driver"    =>  "mysql",
                 "dbname"    =>  "phppuli",
@@ -24,6 +18,7 @@ class ConnectionTest extends PHPUnit_Framework_TestCase {
             ])
         );
         date_default_timezone_set("Europe/Budapest");
+        parent::__construct();
     }
 
     /**
@@ -58,10 +53,6 @@ class ConnectionTest extends PHPUnit_Framework_TestCase {
         $result = $this->connection->fetchAll($sql,$params);
         $this->assertEquals(2,count($result));
     }
-
-    /*
-     * Lehetséges további tesztek hozzáadása, azonban a többi metódus pdo metódus hívások, ami miatt felesleges
-     */
 }
 
 

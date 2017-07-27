@@ -9,7 +9,7 @@
 namespace PandaBase\Exception;
 
 
-class NotInstanceRecord extends \Exception
+class NotInstanceRecordException extends \Exception
 {
     /**
      * NotInstanceRecord constructor.

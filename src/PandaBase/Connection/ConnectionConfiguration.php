@@ -2,6 +2,9 @@
 
 namespace PandaBase\Connection;
 
+use PandaBase\Connection\Scheme\Table;
+use PandaBase\Exception\TableDescriptorNotExists;
+
 /**
  * Class ConnectionConfiguration
  *
@@ -60,36 +63,46 @@ class ConnectionConfiguration {
     private $supportedDrivers = ["mysql","mssql"];
 
     /**
+     * Set of used table descriptors.
+     *
+     * @var Table[]
+     */
+    private $tableDescriptors;
+
+    /**
      * Constructor.
      *
      * Warning: At this moment we support only mysql driver
      *
-     * @param $dbname string Name of the database
+     * @param string $dbname Name of the database
      * @param $driver string Database type. Supported drivers: mysql
      * @param $host string Host
      * @param $name string Name of the connection.
      * @param $password string Database password
      * @param $user string Database username
      * @param array $pdoAttributes
+     * @param Table[] $tableDescriptors
      * @throws \Exception
      */
-    function __construct($dbname, $driver, $host, $name, $password, $user, $pdoAttributes = null)
+    private function __construct(string $dbname, string $driver, $host, $name, $password, $user, $pdoAttributes, $tableDescriptors)
     {
         if(!in_array($driver,$this->supportedDrivers))
             throw new \Exception("Unsupported PDO driver. List of supported drivers:".implode(",",$this->supportedDrivers));
 
         $this->dbname = $dbname;
         $this->driver = $driver;
-        if($host=="localhost") $host = "127.0.0.1";
+        if($host=="localhost") $host = "127.0.0.1"; // To ensure that php does not use unix socket instead of tcp.
         $this->host = $host;
         $this->name = $name;
         $this->password = $password;
         $this->user = $user;
         $this->pdoAttributes = $pdoAttributes;
+        $this->tableDescriptors = $tableDescriptors;
     }
 
     /**
      * Generate a ConnectionConfiguration object from an array.
+     *
      * @param array $configArray
      * @return ConnectionConfiguration
      */
@@ -101,7 +114,8 @@ class ConnectionConfiguration {
             $configArray["name"],
             $configArray["password"],
             $configArray["user"],
-            $configArray["attributes"]
+            $configArray["attributes"] ?? [],
+            $configArray["table_descriptors"] ?? []
         );
     }
 
@@ -174,5 +188,16 @@ class ConnectionConfiguration {
         return $this->supportedDrivers;
     }
 
+    /**
+     * @param $class_name
+     * @return Table
+     * @throws TableDescriptorNotExists
+     */
+    public function getTableDescriptor($class_name) {
+        if(!array_key_exists($class_name,$this->tableDescriptors)) {
+            throw new TableDescriptorNotExists($class_name. " does not exist in Connection configuration");
+        }
+        return $this->tableDescriptors[$class_name];
+    }
 
 } 

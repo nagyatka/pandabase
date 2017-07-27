@@ -1,7 +1,6 @@
 <?php
 
 namespace PandaBase\AccessManagement;
-use PandaBase\Connection\ConnectionManager;
 
 /**
  * Created by PhpStorm.
@@ -18,25 +17,30 @@ class AccessManager
     const GROUP_USER = "group";
     const OTHER_USER = "other";
     const ANON_USER  = "anon";
+
     /**
-     * @var null|AccessUserInterface
+     * @var null|AuthenticatedUserInterface
      */
     private $accessUser;
 
+    /**
+     * AccessManager constructor.
+     */
     public function __construct()
     {
         $this->accessUser = null;
     }
 
     /**
-     * @param AccessUserInterface $accessUser
+     * @param AuthenticatedUserInterface $accessUser
+     * @return void
      */
-    public function registerAccessUser(AccessUserInterface $accessUser) {
+    public function registerUser(AuthenticatedUserInterface $accessUser) {
         $this->accessUser = $accessUser;
     }
 
     /**
-     * @return null|AccessUserInterface
+     * @return null|AuthenticatedUserInterface
      */
     public function getAccessUser() {
         return $this->accessUser;
@@ -44,7 +48,7 @@ class AccessManager
 
     /**
      *
-     * Figyelem! Ha nincs beállított user, akkor a visszatérési érték hamis!!
+     * WARNING! If the registered AuthenticatedUser equals with null in AccessManager the return value is always false.
      *
      * @param AccessibleObject $object
      * @param int $access_type

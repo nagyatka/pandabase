@@ -18,7 +18,6 @@ class Connection {
      */
     private $database;
 
-
     /**
      * @var ConnectionConfiguration
      */

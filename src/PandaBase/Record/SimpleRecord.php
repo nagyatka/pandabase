@@ -11,7 +11,7 @@ namespace PandaBase\Record;
 
 use PandaBase\AccessManagement\AccessibleObject;
 use PandaBase\Connection\ConnectionManager;
-use PandaBase\Connection\TableDescriptor;
+use PandaBase\Connection\Scheme\Table;
 use PandaBase\Exception\AccessDeniedException;
 
 class SimpleRecord extends InstanceRecord {
@@ -19,7 +19,6 @@ class SimpleRecord extends InstanceRecord {
     /**
      * @param $key
      * @param $value
-     * @return mixed
      * @throws AccessDeniedException
      */
     public function set($key, $value)
@@ -36,10 +35,10 @@ class SimpleRecord extends InstanceRecord {
     }
 
     /**
-     * @param TableDescriptor $tableDescriptor
+     * @param Table $tableDescriptor
      * @return RecordHandler
      */
-    public function getRecordHandler(TableDescriptor $tableDescriptor = null)
+    public function getRecordHandler(Table $tableDescriptor = null): RecordHandler
     {
         if($tableDescriptor == null) {
             $simpleHandler = new SimpleRecordHandler($this->getTableDescriptor());

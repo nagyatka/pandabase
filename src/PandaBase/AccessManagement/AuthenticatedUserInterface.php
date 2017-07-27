@@ -9,22 +9,25 @@
 namespace PandaBase\AccessManagement;
 
 
-interface AccessUserInterface
+interface AuthenticatedUserInterface
 {
     /**
-     * Az adott felhasználó rendelkezik-e root jogokkal.
+     * The user has root privileges or not?
+     *
      * @return bool
      */
     public function isRoot();
 
     /**
-     * Az aktuális felhasználó egyedi azonosítója.
+     * Returns with the unique id of the user.
+     *
      * @return int
      */
-    public function getAccessUserId();
+    public function getUserId();
 
     /**
-     * Azonosító tömb.
+     * Returns with array of group ids of the user.
+     *
      * @return array
      */
     public function getGroups();

@@ -10,31 +10,36 @@ namespace PandaBase\Record;
 
 
 use PandaBase\Connection\ConnectionManager;
-use PandaBase\Connection\TableDescriptor;
+use PandaBase\Connection\Scheme\Table;
 use PandaBase\Exception\DatabaseManagerNotExists;
 use PandaBase\Exception\RecordValueNotExists;
 use PandaBase\Exception\TableDescriptorNotExists;
 
-class HistoryAbleRecordHandler extends RecordHandler{
+class HistoryableRecordHandler extends RecordHandler{
 
     /**
+     * Executes INSERT INTO operation and returns with the insert id.
+     *
      * @return int
      */
-    public function insert()
+    public function insert(): int
     {
         $params = $this->databaseRecord->getAll();
         //Felesleges elemek törlése (seq_id,record_status,history,from)
-        unset($params[$this->tableDescriptor->get(TableDescriptor::TABLE_SEQ_ID)]);
+        unset($params[$this->tableDescriptor->get(Table::TABLE_SEQ_ID)]);
         unset($params["history_from"]);
         unset($params["history_to"]);
         unset($params["record_status"]);
+        foreach ($this->tableDescriptor->getAllLazyAttributeNames() as $attributeName) {
+            unset($params[$attributeName]);
+        }
 
         //Tartalmaz-e rec_status-t
-        $containsTableId = array_key_exists($this->tableDescriptor->get(TableDescriptor::TABLE_ID),$params);
+        $containsTableId = array_key_exists($this->tableDescriptor->get(Table::TABLE_ID),$params);
         $params_key      = array_keys($params);
 
         //Lekérdezés összeállítása
-        $insert_query   =   "INSERT INTO"." ".$this->tableDescriptor->get(TableDescriptor::TABLE_NAME)." (";
+        $insert_query   =   "INSERT INTO"." ".$this->tableDescriptor->get(Table::TABLE_NAME)." (";
         for($i = 0; $i < count($params_key); ++$i) {
             $insert_query.= "`".$params_key[$i]."`,";
         }
@@ -60,10 +65,10 @@ class HistoryAbleRecordHandler extends RecordHandler{
             unset($prepared_statement);
 
             //UPDATE lekérdezés összeállítása
-            $update_query = "UPDATE" . " " . $this->tableDescriptor->get(TableDescriptor::TABLE_NAME) . " SET " . $this->tableDescriptor->get(TableDescriptor::TABLE_ID) . "=:" . $this->tableDescriptor->get(TableDescriptor::TABLE_ID) . " WHERE " . $this->tableDescriptor->get(TableDescriptor::TABLE_SEQ_ID) . "=:" . $this->tableDescriptor->get(TableDescriptor::TABLE_SEQ_ID);
+            $update_query = "UPDATE" . " " . $this->tableDescriptor->get(Table::TABLE_NAME) . " SET " . $this->tableDescriptor->get(Table::TABLE_ID) . "=:" . $this->tableDescriptor->get(Table::TABLE_ID) . " WHERE " . $this->tableDescriptor->get(Table::TABLE_SEQ_ID) . "=:" . $this->tableDescriptor->get(Table::TABLE_SEQ_ID);
             $prepared_statement = ConnectionManager::getInstance()->getConnection()->prepare($update_query);
-            $prepared_statement->bindValue($this->tableDescriptor->get(TableDescriptor::TABLE_ID), $insert_id);
-            $prepared_statement->bindValue($this->tableDescriptor->get(TableDescriptor::TABLE_SEQ_ID), $insert_id);
+            $prepared_statement->bindValue($this->tableDescriptor->get(Table::TABLE_ID), $insert_id);
+            $prepared_statement->bindValue($this->tableDescriptor->get(Table::TABLE_SEQ_ID), $insert_id);
             $prepared_statement->execute();
             unset($prepared_statement);
 
@@ -71,22 +76,23 @@ class HistoryAbleRecordHandler extends RecordHandler{
         }
         //Ha már egy korábbi elemhez akarunk új rekordot adni akkor nincs más dolgunk
         else {
-            return $params[$this->tableDescriptor->get(TableDescriptor::TABLE_ID)];
+            return $params[$this->tableDescriptor->get(Table::TABLE_ID)];
         }
     }
 
     /**
+     * Returns with the record based on id parameter. If it doesn't exist returns with an empty array.
      * @param int $id
      * @return array
      */
-    public function select($id)
+    public function select(int $id): array
     {
-        if($id == 0) {
-            return array();
+        if($id < 1) {
+            return [];
         }
-        $select_query   = "SELECT * FROM"." ".$this->tableDescriptor->get(TableDescriptor::TABLE_NAME)." WHERE record_status = 1 AND ".$this->tableDescriptor->get(TableDescriptor::TABLE_ID)."=:".$this->tableDescriptor->get(TableDescriptor::TABLE_ID);
+        $select_query   = "SELECT * FROM"." ".$this->tableDescriptor->get(Table::TABLE_NAME)." WHERE record_status = 1 AND ".$this->tableDescriptor->get(Table::TABLE_ID)."=:".$this->tableDescriptor->get(Table::TABLE_ID);
         $params         = array(
-            $this->tableDescriptor->get(TableDescriptor::TABLE_ID) => $id
+            $this->tableDescriptor->get(Table::TABLE_ID) => $id
         );
         $result = ConnectionManager::getInstance()->getConnection()->fetchAssoc($select_query,$params);
         return $result == false ? array() : $result;
@@ -99,7 +105,7 @@ class HistoryAbleRecordHandler extends RecordHandler{
      */
     public function edit()
     {
-        if(array_key_exists($this->tableDescriptor->get(TableDescriptor::TABLE_ID),$this->databaseRecord->getAll())) {
+        if(array_key_exists($this->tableDescriptor->get(Table::TABLE_ID),$this->databaseRecord->getAll())) {
             $this->remove();
             $this->insert();
         }
@@ -116,9 +122,9 @@ class HistoryAbleRecordHandler extends RecordHandler{
      */
     public function remove()
     {
-        $remove_query   = "UPDATE ".$this->tableDescriptor->get(TableDescriptor::TABLE_NAME)." SET record_status = 0, history_to = NOW() WHERE ".$this->tableDescriptor->get(TableDescriptor::TABLE_ID)."=:".$this->tableDescriptor->get(TableDescriptor::TABLE_ID)." AND record_status=1";
+        $remove_query   = "UPDATE ".$this->tableDescriptor->get(Table::TABLE_NAME)." SET record_status = 0, history_to = NOW() WHERE ".$this->tableDescriptor->get(Table::TABLE_ID)."=:".$this->tableDescriptor->get(Table::TABLE_ID)." AND record_status=1";
         $prepared_statement = ConnectionManager::getInstance()->getConnection()->prepare($remove_query);
-        $prepared_statement->bindValue($this->tableDescriptor->get(TableDescriptor::TABLE_ID),$this->databaseRecord->get($this->tableDescriptor->get(TableDescriptor::TABLE_ID)));
+        $prepared_statement->bindValue($this->tableDescriptor->get(Table::TABLE_ID),$this->databaseRecord->get($this->tableDescriptor->get(Table::TABLE_ID)));
         $prepared_statement->execute();
     }
 }

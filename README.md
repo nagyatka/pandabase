@@ -1,67 +1,116 @@
 #PandaBase
 
-Documentation is under development.
-
 ## Installation
 Install the latest version with
 
 ```bash
 $ composer require nagyatka/pandabase
 ```
+We recommend that use version above v0.20.0.
 
-## Basic Usage
+## How to use ConnectionManager
 
-Run queries:
-
+### Get ConnectionManager instance
+You can reach the ConnectionManager instance globally via `getInstance()` method
 ```php
-use PandaBase\Connection\ConnectionManager;
-
-// Get the manager instance
 $connectionManager = ConnectionManager::getInstance();
-
-// Get mixed result
-$mixedRecords = $connectionManager->getMixedRecords("SELECT * FROM table1");
-
-// List the result
-$mixedRecords->foreachRecords(function (DatabaseRecord $record) {
-    echo $record->get("column_1").": ".$record->get("column_2")."\n";
-});
 ```
 
-Create a class based on database scheme using only inheritance:
+### Add connection to manager object
+You can easily set a new database connection in Pandabase.
 ```php
+$connectionManager->initializeConnection([
+    "name"      =>  "test_connection",  // Connection's name.
+    "driver"    =>  "mysql",            // Same as PDO parameter
+    "dbname"    =>  "test_dbname",      // Same as PDO parameter
+    "host"      =>  "127.0.0.1",        // Same as PDO parameter
+    "user"      =>  "root",             // Same as PDO parameter
+    "password"  =>  ""                  // Same as PDO parameter
+    "attributes"=>  [...]               // Optional, PDO attributes
+]);
+```
 
-use PandaBase\Connection\ConnectionManager;
-use PandaBase\Connection\TableDescriptor;
-use PandaBase\Record\SimpleRecord;
 
-class TestRecord extends SimpleRecord {
+### Add more connection to manager object
+ConnectionManager is able to handle more connection at time. The connections can be distinguished via the name parameter,
+for example you can use `"test_connection1"` and `"test_connection2"` in the following example:
+```php
+$connectionManager->initializeConnections(
+    [
+        [
+            "name"      =>  "test_connection1", // Connection's name.
+            "driver"    =>  "mysql",            // Same as PDO parameter
+            "dbname"    =>  "test_dbname1",     // Same as PDO parameter
+            "host"      =>  "127.0.0.1",        // Same as PDO parameter
+            "user"      =>  "root",             // Same as PDO parameter
+            "password"  =>  ""                  // Same as PDO parameter
+        ],
+        [
+            "name"      =>  "test_connection2", // Connection's name.
+            "driver"    =>  "mysql",            // Same as PDO parameter
+            "dbname"    =>  "test_dbname2",     // Same as PDO parameter
+            "host"      =>  "127.0.0.1",        // Same as PDO parameter
+            "user"      =>  "root",             // Same as PDO parameter
+            "password"  =>  ""                  // Same as PDO parameter
+        ],
 
-    function __construct($id, $values = null) {
-        parent::__construct(
-            new TableDescriptor(
-                [
-                    TABLE_NAME  =>  "table1",
-                    TABLE_ID    =>  "table_id"
-                ]),
-            $id,$values);
-    }
+    ]
+);
+```
 
-}
+### Get connection
+The `getConnection` method returns with the default connection if you leave the name parameter empty.
+```php
+$connection = $connectionManager->getConnection();
+```
 
-// Get a record from database with id=232
-$record = new TestRecord(232);
+### Get connection by name
+```php
+$connection = $connectionManager->getConnection("test_connection2");
+```
 
-echo $record->get("col1")
+### Set the default connection by name
+```php
+$connection = $connectionManager->setDefault("test_connection2");
+$connection = $connectionManager->getConnection(); //returns with test_connection2
+```
+
+### Fetch result from connection
+```php
+// Fetch result from default connection
+$queryResult1 = ConnectionManager::getQueryResult("SELECT * FROM table1");
+
+// Fetch result from default connection with parameters
+$queryResult2 = ConnectionManager::getQueryResult("SELECT * FROM table1 WHERE store_date > :actual_date",[
+    "actual_date" => date("Y-m-d H:i:s")
+]);
+
+// Fetch result from specified connection
+$queryResult3 = ConnectionManager::getQueryResult("SELECT * FROM table1",[],"test_connection2");
 
 ```
 
-## Detailed Usage
-- [Principles](src/PandaBase/Documentation/v1.0/principles.md)
-- [How to use ConnectionManager](src/PandaBase/Documentation/v1.0/init-connection.md)
-- [Create classes based on database scheme](src/PandaBase/Documentation/v1.0/create-classes.md)
-- [How to use the QueryBuilder](src/PandaBase/Documentation/v1.0/query-builder.md)
-- [How to use the DatabaseContainer](src/PandaBase/Documentation/v1.0/database-container.md)
+
+# How to use Connection
+
+Connection is a PDO wrapper (all PDO function is callable) and provides a modified fetchAssoc and fetchAll methods.
+
+### Get connection
+```php
+$connection = $connectionManager->getConnection();
+```
+
+### Fetch a result row as an associative array
+```php
+$result = $connection->fetchAssoc("SELECT * FROM table1 WHERE id = :id",["id" => $id]);
+```
+
+### Returns an array containing all of the result set rows as an associative array
+```php
+$result = $connection->fetchAll("SELECT * FROM table1",[]);
+```
+
+### TODO
 
 
 ## License

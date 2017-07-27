@@ -2,7 +2,7 @@
     "name": "nagyatka/pandabase",
     "type": "library",
     "description": "MySQL Database abstraction",
-    "keywords": ["mysql","pdo","abstraction"],
+    "keywords": ["mysql","pdo","abstraction","orm"],
     "license": "Apache-2.0",
     "homepage": "https://github.com/nagyatka/pandabase",
     "authors": [
@@ -21,7 +21,6 @@
         }
     },
     "require-dev": {
-        "phpunit/phpunit": "*",
-        "phpunit/dbunit": ">=1.2"
+        "phpunit/phpunit": "6.2.3"
     }
 }

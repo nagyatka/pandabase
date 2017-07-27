@@ -1,5 +1,6 @@
 <?php
 use PandaBase\Connection\ConnectionConfiguration;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Created by PhpStorm.
@@ -8,7 +9,7 @@ use PandaBase\Connection\ConnectionConfiguration;
  * Time: 15:41
  */
 
-class ConnectionConfigurationTest extends PHPUnit_Framework_TestCase {
+class ConnectionConfigurationTest extends TestCase {
     public function testConfigurationGeneration() {
         $config = ConnectionConfiguration::generateConfiguration([
             "name"      =>  "test_connection",

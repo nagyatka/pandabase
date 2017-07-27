@@ -10,16 +10,15 @@ namespace PandaBase\Connection;
 
 
 use PandaBase\AccessManagement\AccessManager;
-use PandaBase\AccessManagement\AccessUserInterface;
+use PandaBase\AccessManagement\AuthenticatedUserInterface;
+use PandaBase\Connection\Scheme\Table;
 use PandaBase\Exception\ConnectionNotExistsException;
-use PandaBase\Exception\NotInstanceRecord;
+use PandaBase\Exception\NotInstanceRecordException;
 use PandaBase\Record\InstanceRecord;
-use PandaBase\Record\InstanceRecordContainer;
-use PandaBase\Record\MixedRecordContainer;
 
 /**
  * Class ConnectionManager
- * ConnectionManager manages one or more Connection object. You can get ConnectionManager instance via getInstance method
+ * ConnectionManager manages one or more Connection object. You can get the singleton instance via getInstance method
  * globally.
  * 
  * @package PandaBase\Connection
@@ -79,7 +78,7 @@ class ConnectionManager {
      * @param string|null $name Name of the releaseable connection.
      * @throws ConnectionNotExistsException
      */
-    public function releaseConnection($name = null) {
+    public function releaseConnection(string $name = null) {
         $originalName = $name;
         if($name == null) {
             $name = $this->defaultConnectionName;
@@ -124,7 +123,7 @@ class ConnectionManager {
      * @param array $configs Configuration settings
      * @throws ConnectionNotExistsException
      */
-    public function initializeConnections($configs) {
+    public function initializeConnections(array $configs) {
         $numberOfConnection = count($this->connectionInstances);
         foreach ($configs as $config) {
             $this->initializeConnection($config);
@@ -139,7 +138,7 @@ class ConnectionManager {
      * @return mixed|Connection
      * @throws ConnectionNotExistsException
      */
-    public function getConnection($name = null) {
+    public function getConnection(string $name = null) {
         if($name == null) $name = $this->defaultConnectionName;
         if(!$this->exist($name)) {
             throw new ConnectionNotExistsException($name);
@@ -156,14 +155,13 @@ class ConnectionManager {
         return $this->connectionInstances;
     }
 
-
     /**
      * Check connection exist or not.
      *
      * @param string $name Name of the connection
      * @return bool True if it exists
      */
-    public function exist($name) {
+    public function exist(string $name) {
         return isset($this->connectionInstances[$name]);
     }
 
@@ -173,7 +171,7 @@ class ConnectionManager {
      * @param string $name Name of the connection
      * @throws ConnectionNotExistsException
      */
-    public function setDefault($name) {
+    public function setDefault(string $name) {
         if(!$this->exist($name)) {
             throw new ConnectionNotExistsException($name);
         }
@@ -193,22 +191,23 @@ class ConnectionManager {
     }
 
     /**
-     * Returns with MixedRecordContainer based on sql string and sql params. If you use the method without connectionName
-     * it will use the default connection, by the way it will use the selected connection if it exists.
+     * Returns with array of records based on sql string and sql params. If you use the method without connectionName
+     * it uses the default connection, by the way it will use the selected connection if it exists.
      *
      * @param string $query_string SQL string
      * @param array $params Parameters for query
      * @param string $connectionName Name of the connection
      * @throws ConnectionNotExistsException
-     * @return MixedRecordContainer
+     * @return array
      */
-    public function getMixedRecords($query_string,$params=[],$connectionName=null) {
-        $query_result = $this->getConnection($connectionName)->fetchAll($query_string,$params);
-        return new MixedRecordContainer($query_result == false ? array() : $query_result);
+    public static function getQueryResult(string $query_string, array $params = [], string $connectionName = null) {
+        $connectionManager = ConnectionManager::getInstance();
+        $query_result = $connectionManager->getConnection($connectionName)->fetchAll($query_string,$params);
+        return ($query_result == false ? array() : $query_result);
     }
 
     /**
-     * Returns with InstanceRecordContainer based on sql string and sql params. If you use the method without connectionName
+     * Returns with array of InstanceRecord based on sql string and sql params. If you use the method without connectionName
      * it will use the default connection, by the way it will use the selected connection if it exists.
      *
      * @param string $class_name Name of the class.
@@ -216,15 +215,16 @@ class ConnectionManager {
      * @param array $params Paramters for query
      * @param string $connectionName Name of the connection
      * @throws ConnectionNotExistsException
-     * @return InstanceRecordContainer
+     * @return array
      */
-    public function getInstanceRecords($class_name,$query_string,$params=[],$connectionName=null) {
-        $query_result = $this->getConnection($connectionName)->fetchAll($query_string,$params);
+    public static function getInstanceRecords(string $class_name, string $query_string, array $params = [], string $connectionName = null) {
+        $connectionManager = ConnectionManager::getInstance();
+        $query_result = $connectionManager->getConnection($connectionName)->fetchAll($query_string,$params);
         $records = array();
         foreach ($query_result as $result) {
             $records[] = new $class_name(0,$result);
         }
-        return new InstanceRecordContainer($class_name,$records);
+        return $records;
     }
 
     /**
@@ -235,19 +235,19 @@ class ConnectionManager {
      * @param string $connectionName
      * @throws \Exception
      */
-    public function persist(InstanceRecord &$instanceRecord,$connectionName=null) {
+    public function persist(InstanceRecord &$instanceRecord, string $connectionName = null) {
         $prevConnectionName = $this->defaultConnectionName;
         if($connectionName != null){
             $this->setDefault($connectionName);
         }
 
         if(!$instanceRecord instanceof InstanceRecord) {
-            throw new NotInstanceRecord(get_class($instanceRecord));
+            throw new NotInstanceRecordException(get_class($instanceRecord));
         }
 
         if($instanceRecord->isNewInstance()) {
             $insertId = $instanceRecord->getRecordHandler()->insert();
-            $instanceRecord[$instanceRecord->getTableDescriptor()->get(TABLE_ID)] = $insertId;
+            $instanceRecord[$instanceRecord->getTableDescriptor()->get(Table::TABLE_ID)] = $insertId;
 
         } else {
             $instanceRecord->getRecordHandler()->edit();
@@ -260,20 +260,20 @@ class ConnectionManager {
      * Save all InstanceRecord in the database. If you use the method without connectionName
      * it will use the default connection, by the way it will use the selected connection if it exists.
      *
-     * @param InstanceRecordContainer $instanceRecordContainer
+     * @param array $instanceRecords
      * @param string|null $connectionName
      */
-    public function persistAll(InstanceRecordContainer $instanceRecordContainer,$connectionName=null) {
-        $instanceRecordContainer->foreachRecords(function($record) use($connectionName) {
-            $this->persist($record,$connectionName);
-        });
+    public function persistAll(array $instanceRecords, string $connectionName = null) {
+        foreach ($instanceRecords as $instanceRecord) {
+            $this->persist($instanceRecord,$connectionName);
+        }
     }
 
     /**
-     * @param AccessUserInterface $accessUser
+     * @param AuthenticatedUserInterface $accessUser
      */
-    public function registerAccessUser(AccessUserInterface $accessUser) {
-        $this->accessManager->registerAccessUser($accessUser);
+    public function registerAuthenticatedUser(AuthenticatedUserInterface $accessUser) {
+        $this->accessManager->registerUser($accessUser);
     }
 
     /**
@@ -281,5 +281,16 @@ class ConnectionManager {
      */
     public function getAccessManager() {
         return $this->accessManager;
+    }
+
+    /**
+     * @param string $class_name
+     * @return Table
+     */
+    public static function getTableDescriptor(string $class_name) {
+        return ConnectionManager::getInstance()
+            ->getConnection() // Get actual connection
+            ->getConnectionConfiguration()
+            ->getTableDescriptor($class_name);
     }
 } 

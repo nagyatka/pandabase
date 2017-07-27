@@ -10,7 +10,7 @@ namespace PandaBase\Record;
 
 
 use PandaBase\Connection\ConnectionManager;
-use PandaBase\Connection\TableDescriptor;
+use PandaBase\Connection\Scheme\Table;
 use PandaBase\Exception\DatabaseManagerNotExists;
 
 abstract class RecordHandler {
@@ -26,43 +26,46 @@ abstract class RecordHandler {
     protected $databaseRecord;
 
     /**
-     * @var TableDescriptor
+     * @var Table
      */
     protected $tableDescriptor;
 
     /**
-     * @param TableDescriptor $tableDescriptor
+     * @param Table $tableDescriptor
      * @throws DatabaseManagerNotExists
      */
-    function __construct(TableDescriptor $tableDescriptor) {
+    function __construct(Table $tableDescriptor) {
         $this->connectionManager = ConnectionManager::getInstance();
         $this->tableDescriptor = $tableDescriptor;
         $this->databaseRecord = null;
     }
 
-    function setManagedRecord(DatabaseRecord $databaseRecord) {
-        $this->databaseRecord = $databaseRecord;
+    /**
+     * @param InstanceRecord $instanceRecord
+     */
+    function setManagedRecord(InstanceRecord $instanceRecord) {
+        $this->databaseRecord = $instanceRecord;
         $this->tableDescriptor = $this->databaseRecord->getTableDescriptor();
     }
 
     /**
      * @return int
      */
-    abstract public function insert();
+    abstract public function insert(): int;
 
     /**
      * @param int $id
      * @return array
      */
-    abstract public function select($id);
+    abstract public function select(int $id);
 
     /**
      * @return mixed
      */
-    abstract public function edit();
+    abstract public function edit(): mixed;
 
     /**
-     * @return mixed
+     * @return void
      */
     abstract public function remove();
 
