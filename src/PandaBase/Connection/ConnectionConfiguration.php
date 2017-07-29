@@ -3,7 +3,7 @@
 namespace PandaBase\Connection;
 
 use PandaBase\Connection\Scheme\Table;
-use PandaBase\Exception\TableDescriptorNotExists;
+use PandaBase\Exception\TableNotExists;
 
 /**
  * Class ConnectionConfiguration
@@ -67,7 +67,7 @@ class ConnectionConfiguration {
      *
      * @var Table[]
      */
-    private $tableDescriptors;
+    private $tables;
 
     /**
      * Constructor.
@@ -81,10 +81,10 @@ class ConnectionConfiguration {
      * @param $password string Database password
      * @param $user string Database username
      * @param array $pdoAttributes
-     * @param Table[] $tableDescriptors
+     * @param Table[] $tables
      * @throws \Exception
      */
-    private function __construct(string $dbname, string $driver, $host, $name, $password, $user, $pdoAttributes, $tableDescriptors)
+    private function __construct(string $dbname, string $driver, $host, $name, $password, $user, $pdoAttributes, $tables)
     {
         if(!in_array($driver,$this->supportedDrivers))
             throw new \Exception("Unsupported PDO driver. List of supported drivers:".implode(",",$this->supportedDrivers));
@@ -97,7 +97,7 @@ class ConnectionConfiguration {
         $this->password = $password;
         $this->user = $user;
         $this->pdoAttributes = $pdoAttributes;
-        $this->tableDescriptors = $tableDescriptors;
+        $this->tables = $tables;
     }
 
     /**
@@ -115,7 +115,7 @@ class ConnectionConfiguration {
             $configArray["password"],
             $configArray["user"],
             $configArray["attributes"] ?? [],
-            $configArray["table_descriptors"] ?? []
+            $configArray["tables"] ?? []
         );
     }
 
@@ -191,13 +191,13 @@ class ConnectionConfiguration {
     /**
      * @param $class_name
      * @return Table
-     * @throws TableDescriptorNotExists
+     * @throws TableNotExists
      */
-    public function getTableDescriptor($class_name) {
-        if(!array_key_exists($class_name,$this->tableDescriptors)) {
-            throw new TableDescriptorNotExists($class_name. " does not exist in Connection configuration");
+    public function getTable($class_name) {
+        if(!array_key_exists($class_name,$this->tables)) {
+            throw new TableNotExists($class_name. " does not exist in Connection configuration");
         }
-        return $this->tableDescriptors[$class_name];
+        return $this->tables[$class_name];
     }
 
 } 

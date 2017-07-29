@@ -36,7 +36,7 @@ class HistoryableRecord extends InstanceRecord {
     public function getRecordHandler(Table $tableDescriptor = null): RecordHandler
     {
         if($tableDescriptor == null) {
-            $simpleHandler = new HistoryableRecordHandler($this->getTableDescriptor());
+            $simpleHandler = new HistoryableRecordHandler($this->getTable());
             $simpleHandler->setManagedRecord($this);
             return $simpleHandler;
         } else {
@@ -56,10 +56,10 @@ class HistoryableRecord extends InstanceRecord {
      * @param string $to
      * @return array
      * @throws \PandaBase\Exception\RecordValueNotExists
-     * @throws \PandaBase\Exception\TableDescriptorNotExists
+     * @throws \PandaBase\Exception\TableNotExists
      */
     public function getHistoryBetweenDates($from = null ,$to = null) {
-        $tableDescriptor = $this->getTableDescriptor();
+        $tableDescriptor = $this->getTable();
 
         $sql =
             "SELECT * FROM ".$tableDescriptor->get(Table::TABLE_NAME)." ".
@@ -82,10 +82,10 @@ class HistoryableRecord extends InstanceRecord {
      * @return int
      * @throws \PandaBase\Exception\ConnectionNotExistsException
      * @throws \PandaBase\Exception\RecordValueNotExists
-     * @throws \PandaBase\Exception\TableDescriptorNotExists
+     * @throws \PandaBase\Exception\TableNotExists
      */
     protected function getHistoryAtDateInternal($date) {
-        $tableDescriptor = $this->getTableDescriptor();
+        $tableDescriptor = $this->getTable();
         $sql =
             "SELECT ".$tableDescriptor->get(Table::TABLE_ID)." ".
             "FROM ".  $tableDescriptor->get(Table::TABLE_NAME)." ".

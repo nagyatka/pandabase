@@ -29,7 +29,7 @@ class SimpleRecordTest extends TestCase
             "host"      =>  "localhost",
             "user"      =>  "root",
             "password"  =>  "",
-            "table_descriptors" => [
+            "tables" => [
                 TestClassA::class => $testClassADescriptor,
                 TestClassB::class => $testClassADescriptor
             ]
@@ -38,7 +38,7 @@ class SimpleRecordTest extends TestCase
         $getTableDesc = ConnectionManager::getInstance()
             ->getConnection()
             ->getConnectionConfiguration()
-            ->getTableDescriptor(TestClassA::class);
+            ->getTable(TestClassA::class);
 
         $this->assertEquals($testClassADescriptor,$getTableDesc);
     }
@@ -59,7 +59,7 @@ class SimpleRecordTest extends TestCase
         $this->assertEquals(ConnectionManager::getInstance()
             ->getConnection()
             ->getConnectionConfiguration()
-            ->getTableDescriptor(TestClassA::class),$testObj->getTableDescriptor());
+            ->getTable(TestClassA::class),$testObj->getTable());
 
         $this->assertInstanceOf(TestClassB::class,$testObj["sub_table"]);
     }

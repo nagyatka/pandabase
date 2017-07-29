@@ -9,7 +9,7 @@
 namespace PandaBase\Connection\Scheme;
 
 
-use PandaBase\Exception\TableDescriptorNotExists;
+use PandaBase\Exception\TableNotExists;
 
 
 /**
@@ -51,11 +51,11 @@ class Table {
      *
      * @param string $descriptorKey
      * @return mixed
-     * @throws TableDescriptorNotExists
+     * @throws TableNotExists
      */
     public function get($descriptorKey) {
         if(!array_key_exists($descriptorKey,$this->descriptor)) {
-            throw new TableDescriptorNotExists("Descriptor ".$descriptorKey." not exists");
+            throw new TableNotExists("Descriptor ".$descriptorKey." not exists");
         }
         return $this->descriptor[$descriptorKey];
     }

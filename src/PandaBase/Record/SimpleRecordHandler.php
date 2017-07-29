@@ -77,20 +77,20 @@ class SimpleRecordHandler extends RecordHandler {
     {
         if(array_key_exists($this->tableDescriptor->get(Table::TABLE_ID),$this->databaseRecord->getAll())) {
             //Ki kell szedni az id értéket, hogy az ne kerüljön bele SET részbe
-            $id = $this->databaseRecord->get($this->databaseRecord->getTableDescriptor()->get(Table::TABLE_ID));
+            $id = $this->databaseRecord->get($this->databaseRecord->getTable()->get(Table::TABLE_ID));
             $params = $this->databaseRecord->getAll();
-            unset($params[$this->databaseRecord->getTableDescriptor()->get(Table::TABLE_ID)]);
+            unset($params[$this->databaseRecord->getTable()->get(Table::TABLE_ID)]);
 
             $params_key =   array_keys($params);
 
-            $sql = "UPDATE ".$this->databaseRecord->getTableDescriptor()->get(Table::TABLE_NAME)." SET ";
+            $sql = "UPDATE ".$this->databaseRecord->getTable()->get(Table::TABLE_NAME)." SET ";
             for($i = 0; $i < count($params_key); ++$i) {
                 $sql.= $params_key[$i]."= :".$params_key[$i];
                 if($i != count($params_key)-1) $sql.=",";
             }
-            $sql.= " WHERE ".$this->databaseRecord->getTableDescriptor()->get(Table::TABLE_ID)."=:".$this->databaseRecord->getTableDescriptor()->get(Table::TABLE_ID);
+            $sql.= " WHERE ".$this->databaseRecord->getTable()->get(Table::TABLE_ID)."=:".$this->databaseRecord->getTable()->get(Table::TABLE_ID);
             //Visszatesszük az értéket
-            $params[$this->databaseRecord->getTableDescriptor()->get(Table::TABLE_ID)] = $id;
+            $params[$this->databaseRecord->getTable()->get(Table::TABLE_ID)] = $id;
             unset($params_key);
             $params_key =   array_keys($params);
 
@@ -113,10 +113,10 @@ class SimpleRecordHandler extends RecordHandler {
      */
     public function remove()
     {
-        $sql = "DELETE FROM"." ".$this->databaseRecord->getTableDescriptor()->get(Table::TABLE_NAME)."
-                WHERE ".$this->databaseRecord->getTableDescriptor()->get(Table::TABLE_ID)."= :".$this->databaseRecord->getTableDescriptor()->get(Table::TABLE_ID);
+        $sql = "DELETE FROM"." ".$this->databaseRecord->getTable()->get(Table::TABLE_NAME)."
+                WHERE ".$this->databaseRecord->getTable()->get(Table::TABLE_ID)."= :".$this->databaseRecord->getTable()->get(Table::TABLE_ID);
         $prepared_statement = ConnectionManager::getInstance()->getConnection()->prepare($sql);
-        $prepared_statement->bindValue($this->databaseRecord->getTableDescriptor()->get(Table::TABLE_ID),$this->databaseRecord->get($this->databaseRecord->getTableDescriptor()->get(Table::TABLE_ID)));
+        $prepared_statement->bindValue($this->databaseRecord->getTable()->get(Table::TABLE_ID),$this->databaseRecord->get($this->databaseRecord->getTable()->get(Table::TABLE_ID)));
         $prepared_statement->execute();
     }
 

@@ -41,7 +41,7 @@ class SimpleRecord extends InstanceRecord {
     public function getRecordHandler(Table $tableDescriptor = null): RecordHandler
     {
         if($tableDescriptor == null) {
-            $simpleHandler = new SimpleRecordHandler($this->getTableDescriptor());
+            $simpleHandler = new SimpleRecordHandler($this->getTable());
             $simpleHandler->setManagedRecord($this);
             return $simpleHandler;
         } else {

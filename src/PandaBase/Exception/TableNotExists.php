@@ -9,4 +9,4 @@
 namespace PandaBase\Exception;
 
 
-class TableDescriptorNotExists extends \Exception {}
+class TableNotExists extends \Exception {}

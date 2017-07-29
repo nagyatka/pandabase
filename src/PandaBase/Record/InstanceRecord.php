@@ -21,18 +21,18 @@ abstract class InstanceRecord implements \ArrayAccess {
     /**
      * @var Table
      */
-    private $tableDescriptor;
+    private $table;
 
     /**
      * InstanceRecord constructor.
      *
      * @param integer|array $argument
      */
-    function __construct($argument) {
-        $this->tableDescriptor = ConnectionManager::getTableDescriptor(get_class($this));
+    function __construct($argument = null) {
+        $this->table = ConnectionManager::getTable(get_class($this));
         // If the argument contains an id, we try to load the appropriate record from the table
         if(is_int($argument) || is_numeric($argument)) {
-            $values = $this->getRecordHandler($this->tableDescriptor)->select(intval($argument));
+            $values = $this->getRecordHandler($this->table)->select(intval($argument));
         }
         // If the argument is an array, we suppose that it contains the columns of a record from the table
         // We have to highlight if the array contains the TableDescriptor::TABLE_ID we suppose the record
@@ -69,10 +69,10 @@ abstract class InstanceRecord implements \ArrayAccess {
      * returns with true. Otherwise the return value is false.
      *
      * @return bool
-     * @throws \PandaBase\Exception\TableDescriptorNotExists
+     * @throws \PandaBase\Exception\TableNotExists
      */
     public function isNewInstance(): bool {
-        return !isset($this->getAll()[$this->getTableDescriptor()->get(Table::TABLE_ID)]);
+        return !isset($this->getAll()[$this->getTable()->get(Table::TABLE_ID)]);
     }
 
     /**
@@ -92,7 +92,7 @@ abstract class InstanceRecord implements \ArrayAccess {
             }
         }
         // Check lazy load
-        $descriptor = ConnectionManager::getTableDescriptor(get_class($this));
+        $descriptor = ConnectionManager::getTable(get_class($this));
         if($descriptor->isLazyAttribute($key) && !isset($this->values[$key])) {
             $lazy  = $descriptor->getLazyAttribute($key);
             $class = $lazy->getClass();
@@ -109,9 +109,9 @@ abstract class InstanceRecord implements \ArrayAccess {
     /**
      * @return Table
      */
-    public function getTableDescriptor(): Table
+    public function getTable(): Table
     {
-        return $this->tableDescriptor;
+        return $this->table;
     }
 
     /**
@@ -168,7 +168,7 @@ abstract class InstanceRecord implements \ArrayAccess {
      */
     public function offsetExists($offset): bool
     {
-        return array_key_exists($offset,$this->values) || $this->tableDescriptor->isLazyAttribute($offset);
+        return array_key_exists($offset,$this->values) || $this->table->isLazyAttribute($offset);
     }
 
     /**

@@ -191,8 +191,9 @@ class ConnectionManager {
     }
 
     /**
-     * Returns with array of records based on sql string and sql params. If you use the method without connectionName
-     * it uses the default connection, by the way it will use the selected connection if it exists.
+     * Returns with array of records (values of a record have been stored in associative array) based on sql string and
+     * sql params. If you use the method without connectionName it uses the default connection, by the way it will use
+     * the selected connection if it exists.
      *
      * @param string $query_string SQL string
      * @param array $params Parameters for query
@@ -200,9 +201,25 @@ class ConnectionManager {
      * @throws ConnectionNotExistsException
      * @return array
      */
-    public static function getQueryResult(string $query_string, array $params = [], string $connectionName = null) {
+    public static function fetchAll(string $query_string, array $params = [], string $connectionName = null) {
         $connectionManager = ConnectionManager::getInstance();
         $query_result = $connectionManager->getConnection($connectionName)->fetchAll($query_string,$params);
+        return ($query_result == false ? array() : $query_result);
+    }
+
+    /**
+     * Returns with an associative array of requested result based on sql string and sql params. If you use the method
+     * without connectionName it uses the default connection, by the way it will use the selected connection if it
+     * exists.
+     *
+     * @param string $query_string
+     * @param array $params
+     * @param string|null $connectionName
+     * @return array|mixed
+     */
+    public static function fetchAssoc(string $query_string, array $params = [], string $connectionName = null) {
+        $connectionManager = ConnectionManager::getInstance();
+        $query_result = $connectionManager->getConnection($connectionName)->fetchAssoc($query_string,$params);
         return ($query_result == false ? array() : $query_result);
     }
 
@@ -235,10 +252,11 @@ class ConnectionManager {
      * @param string $connectionName
      * @throws \Exception
      */
-    public function persist(InstanceRecord &$instanceRecord, string $connectionName = null) {
-        $prevConnectionName = $this->defaultConnectionName;
+    public static function persist(InstanceRecord &$instanceRecord, string $connectionName = null) {
+        $connectionManager = ConnectionManager::getInstance();
+        $prevConnectionName = $connectionManager->defaultConnectionName;
         if($connectionName != null){
-            $this->setDefault($connectionName);
+            $connectionManager->setDefault($connectionName);
         }
 
         if(!$instanceRecord instanceof InstanceRecord) {
@@ -247,13 +265,13 @@ class ConnectionManager {
 
         if($instanceRecord->isNewInstance()) {
             $insertId = $instanceRecord->getRecordHandler()->insert();
-            $instanceRecord[$instanceRecord->getTableDescriptor()->get(Table::TABLE_ID)] = $insertId;
+            $instanceRecord[$instanceRecord->getTable()->get(Table::TABLE_ID)] = $insertId;
 
         } else {
             $instanceRecord->getRecordHandler()->edit();
         }
 
-        $this->defaultConnectionName = $prevConnectionName;
+        $connectionManager->defaultConnectionName = $prevConnectionName;
     }
 
     /**
@@ -263,9 +281,9 @@ class ConnectionManager {
      * @param array $instanceRecords
      * @param string|null $connectionName
      */
-    public function persistAll(array $instanceRecords, string $connectionName = null) {
+    public static function persistAll(array $instanceRecords, string $connectionName = null) {
         foreach ($instanceRecords as $instanceRecord) {
-            $this->persist($instanceRecord,$connectionName);
+            ConnectionManager::persist($instanceRecord,$connectionName);
         }
     }
 
@@ -287,10 +305,10 @@ class ConnectionManager {
      * @param string $class_name
      * @return Table
      */
-    public static function getTableDescriptor(string $class_name) {
+    public static function getTable(string $class_name) {
         return ConnectionManager::getInstance()
             ->getConnection() // Get actual connection
             ->getConnectionConfiguration()
-            ->getTableDescriptor($class_name);
+            ->getTable($class_name);
     }
 } 

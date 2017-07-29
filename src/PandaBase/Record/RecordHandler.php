@@ -45,7 +45,7 @@ abstract class RecordHandler {
      */
     function setManagedRecord(InstanceRecord $instanceRecord) {
         $this->databaseRecord = $instanceRecord;
-        $this->tableDescriptor = $this->databaseRecord->getTableDescriptor();
+        $this->tableDescriptor = $this->databaseRecord->getTable();
     }
 
     /**

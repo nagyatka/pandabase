@@ -13,7 +13,7 @@ use PandaBase\Connection\ConnectionManager;
 use PandaBase\Connection\Scheme\Table;
 use PandaBase\Exception\DatabaseManagerNotExists;
 use PandaBase\Exception\RecordValueNotExists;
-use PandaBase\Exception\TableDescriptorNotExists;
+use PandaBase\Exception\TableNotExists;
 
 class HistoryableRecordHandler extends RecordHandler{
 
@@ -100,7 +100,7 @@ class HistoryableRecordHandler extends RecordHandler{
 
     /**
      * @return mixed|void
-     * @throws TableDescriptorNotExists
+     * @throws TableNotExists
      * @throws RecordValueNotExists
      */
     public function edit()
@@ -117,7 +117,7 @@ class HistoryableRecordHandler extends RecordHandler{
     /**
      * @return void
      * @throws DatabaseManagerNotExists
-     * @throws TableDescriptorNotExists
+     * @throws TableNotExists
      * @throws RecordValueNotExists
      */
     public function remove()

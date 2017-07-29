@@ -2,9 +2,9 @@
 use PandaBase\Connection\Scheme\Table;
 use PHPUnit\Framework\TestCase;
 
-class TableDescriptorTest extends TestCase {
+class TableTest extends TestCase {
 
-    public function testTableDescriptorInitialization() {
+    public function testTableInitialization() {
         $tableDescriptor = new Table(array(
             Table::TABLE_NAME   =>  "my_table_name",
             Table::TABLE_ID     =>  "my_table_id",
@@ -17,7 +17,7 @@ class TableDescriptorTest extends TestCase {
     }
 
     /**
-     * @expectedException Pandabase\Exception\TableDescriptorNotExists
+     * @expectedException Pandabase\Exception\TableNotExists
      */
     public function testNotExistingDescriptorKey() {
         $tableDescriptor = new Table(array());
