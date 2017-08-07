@@ -286,7 +286,7 @@ $connectionManager->initializeConnection([
         Transaction::class  => new Table([
             Table::TABLE_NAME => "orders",
             Table::TABLE_ID   => "order_id",
-            Table::TABLE_SEQ_ID => ""
+            Table::TABLE_SEQ_ID => "order_sequence_id"
         ]),
         ...
     ]
@@ -303,11 +303,88 @@ Now you can use HistoryableRecord as a SimpleRecord, but you can get also histor
     $orderHistory = $order->getHistoryBetweenDates("2017-01-05","2017-01-08");
 ```
 
+### Lazy attributes
 
-#### TODO:
+Sometimes you have to store foreign keys in your table to represent connection between different objects. Without lazy
+attribute load you can load the objects this way:
+```php
+    $transaction = new Transaction($transactionId);
+    $order = new Order($transaction->get("order_id")); // We suppose that a transaction table also stores a valid order_id
+```
+Or if you want to provide a class method:
+```php
+    class Transaction extends SimpleRecord {
+        // ...
+        
+        /** @var Order */
+        private $order
+        
+        // ...
+        
+        /** @return Order */
+        public function getOrder() {
+            if($this->order == null) {
+                $this->order = new Order($this->get("order_id"));
+            }
+            return $this->order;
+        }
+    }
+```
+Instead of this, you can use LazyAttribute to implement this kind of connection on fast and easily way.
 
-LazyAttributes
-AccessManagement
+
+First you have to extend your table description. In our example we'd like to store an 'order_id' for a transaction record
+and want to reach the appropriate Order instance via 'order' key:
+```php
+$connectionManager->initializeConnection([
+    "name"      =>  "test_connection",  // Connection's name.
+    "driver"    =>  "mysql",            // Same as PDO parameter
+    "dbname"    =>  "database_name",    // Same as PDO parameter
+    "host"      =>  "127.0.0.1",        // Same as PDO parameter
+    "user"      =>  "root",             // Same as PDO parameter
+    "password"  =>  ""                  // Same as PDO parameter
+    "attributes"=>  [
+        attributeName => value,
+        ...
+    ],                                  // Optional, PDO attributes
+    "tables"    =>  [
+        Transaction::class  => new Table([
+            Table::TABLE_NAME   => "orders",
+            Table::TABLE_ID     => "order_id",
+            Table::TABLE_SEQ_ID => "order_sequence_id"
+        ]),
+        Transaction::class  => new Table([
+            Table::TABLE_NAME       => "transactions",
+            Table::TABLE_ID         => "transaction_id",
+            Table::LAZY_ATTRIBUTES  => [
+                "order" => new LazyAttribute("order_id",Order::class)
+            ]
+        ]),
+        ...
+    ]
+]);
+```
+(We supposed that you extended the mysql table declaration too with the new 'order_id' column.)
+
+Now you can use a Transaction instance in the following way:
+
+```php
+// Load Transaction instance from db
+$transaction = new Transaction($transactionId);
+
+echo $transation->get("store_date").": ".$transaction["transaction_value"]; // You can use object as an array
+
+/** @var Order $transactionOrder */
+$transactionOrder = $transaction["order"]; // Return with an Order instance
+$transactionOrderHistory = $transactionOrder->getHistory();
+```
+
+
+
+
+
+
+####### TODO: AccessManagement
 
 
 ## License
