@@ -32,7 +32,7 @@ abstract class InstanceRecord implements \ArrayAccess {
         $this->table = ConnectionManager::getTable(get_class($this));
         // If the argument contains an id, we try to load the appropriate record from the table
         if(is_int($argument) || is_numeric($argument)) {
-            $values = $this->getRecordHandler($this->table)->select(intval($argument));
+            $this->values = $this->getRecordHandler($this->table)->select(intval($argument));
         }
         // If the argument is an array, we suppose that it contains the columns of a record from the table
         // We have to highlight if the array contains the TableDescriptor::TABLE_ID we suppose the record

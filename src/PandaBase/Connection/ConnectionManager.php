@@ -239,7 +239,7 @@ class ConnectionManager {
         $query_result = $connectionManager->getConnection($connectionName)->fetchAll($query_string,$params);
         $records = array();
         foreach ($query_result as $result) {
-            $records[] = new $class_name(0,$result);
+            $records[] = new $class_name($result);
         }
         return $records;
     }

@@ -283,9 +283,9 @@ $connectionManager->initializeConnection([
         ...
     ],                                  // Optional, PDO attributes
     "tables"    =>  [
-        Transaction::class  => new Table([
-            Table::TABLE_NAME => "orders",
-            Table::TABLE_ID   => "order_id",
+        Order::class  => new Table([
+            Table::TABLE_NAME   => "orders",
+            Table::TABLE_ID     => "order_id",
             Table::TABLE_SEQ_ID => "order_sequence_id"
         ]),
         ...
@@ -317,7 +317,7 @@ Or if you want to provide a class method:
         // ...
         
         /** @var Order */
-        private $order
+        private $order;
         
         // ...
         
@@ -348,7 +348,7 @@ $connectionManager->initializeConnection([
         ...
     ],                                  // Optional, PDO attributes
     "tables"    =>  [
-        Transaction::class  => new Table([
+        Order::class  => new Table([
             Table::TABLE_NAME   => "orders",
             Table::TABLE_ID     => "order_id",
             Table::TABLE_SEQ_ID => "order_sequence_id"

@@ -85,6 +85,10 @@ class Table {
         if($this->allLazyAttributeNames != null) {
             return $this->allLazyAttributeNames;
         }
+        if(!isset($this->descriptor[Table::LAZY_ATTRIBUTES])) {
+            $this->allLazyAttributeNames = [];
+            return [];
+        }
         $this->allLazyAttributeNames = array_keys($this->descriptor[Table::LAZY_ATTRIBUTES]);
         return $this->allLazyAttributeNames;
     }
