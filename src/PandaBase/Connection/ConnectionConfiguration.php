@@ -114,8 +114,8 @@ class ConnectionConfiguration {
             $configArray["name"],
             $configArray["password"],
             $configArray["user"],
-            $configArray["attributes"] ?? [],
-            $configArray["tables"] ?? []
+            $configArray[Connection::ATTRIBUTES] ?? [],
+            $configArray[Connection::TABLES] ?? []
         );
     }
 

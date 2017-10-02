@@ -12,6 +12,9 @@ use PDO;
  */
 class Connection {
 
+    const TABLES = "tables";
+    const ATTRIBUTES = "attributes";
+
     /**
      * PHP PDO object.
      * @var PDO
