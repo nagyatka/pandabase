@@ -2,8 +2,10 @@
 
 namespace PandaBase\Record;
 
+use function Couchbase\defaultDecoder;
 use PandaBase\AccessManagement\AccessibleObject;
 use PandaBase\Connection\ConnectionManager;
+use PandaBase\Connection\Scheme\LazyAttribute;
 use PandaBase\Connection\Scheme\Table;
 use PandaBase\Exception\AccessDeniedException;
 
@@ -65,13 +67,16 @@ abstract class InstanceRecord implements \ArrayAccess {
     }
 
     /**
-     * Checks the existence of the TABLE_ID on the instance. If it does not, it will interpret it as a new instance and
-     * returns with true. Otherwise the return value is false.
+     * Checks that the instance is already added (returns with true) to the database or not (returns with false).
      *
      * @return bool
      * @throws \PandaBase\Exception\TableNotExists
      */
     public function isNewInstance(): bool {
+        /*
+         * Checks the existence of the TABLE_ID on the instance. If it does not exist, it will interpret it as a new
+         * instance and returns with true. Otherwise the return value is false.
+         */
         return !isset($this->getAll()[$this->getTable()->get(Table::TABLE_ID)]);
     }
 
@@ -80,6 +85,7 @@ abstract class InstanceRecord implements \ArrayAccess {
      * @param string $key
      * @return mixed
      * @throws AccessDeniedException
+     * @throws \Exception
      */
     public function get(string $key)
     {
@@ -96,8 +102,23 @@ abstract class InstanceRecord implements \ArrayAccess {
         if($descriptor->isLazyAttribute($key) && !isset($this->values[$key])) {
             $lazy  = $descriptor->getLazyAttribute($key);
             $class = $lazy->getClass();
+            $type  = $lazy->getType();
             // We have to set value this way, because the write access is not guaranteed via 'set' function call
-            $this->values[$key] = new $class($this[$lazy->getForeignKey()]);
+            switch ($type) {
+                case LazyAttribute::OneToOne:
+                    $this->values[$key] = new $class($this[$lazy->getKey()]);
+                    break;
+                case LazyAttribute::OneToMany:
+                    $query_result = $this->getRecordHandler()->list($lazy->getKey(), $this[Table::TABLE_ID]);
+                    $records = array();
+                    foreach ($query_result as $result) {
+                        $records[] = new $class($result);
+                    }
+                    $this->values[$key] = $records;
+                    break;
+                default:
+                    throw new \InvalidArgumentException("Unknown LazyAttribute type (".$type.") for class ".$class);
+            }
         }
 
         if(!isset($this->values[$key])) {
@@ -115,11 +136,22 @@ abstract class InstanceRecord implements \ArrayAccess {
     }
 
     /**
-     * @param $key
-     * @param $value
-     * @return void
+     * @param mixed $key
+     * @param mixed $value
+     * @throws AccessDeniedException
      */
-    public abstract function set($key,$value);
+    public function set(mixed $key, mixed $value)
+    {
+        // Ha van beállítva jogosultság, akkor ellenőrizni kell
+        if(in_array(AccessibleObject::class,class_uses($this))) {
+            /** @var AccessibleObject $object */
+            $object = $this;
+            if(!ConnectionManager::getInstance()->getAccessManager()->checkWriteAccess($object)) {
+                throw new AccessDeniedException;
+            }
+        }
+        $this->values[$key] = $value;
+    }
 
     /**
      * @param $params

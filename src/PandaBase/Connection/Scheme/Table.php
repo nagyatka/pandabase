@@ -21,10 +21,21 @@ use PandaBase\Exception\TableNotExists;
  */
 class Table {
 
+    /*
+     * Necessary constants (fields) for all RecordHandlers
+     */
     const TABLE_NAME        = "table_name";
     const TABLE_ID          = "table_id";
-    const TABLE_SEQ_ID      = "table_seq_id";
     const LAZY_ATTRIBUTES   = "lazy_attributes";
+
+    /*
+     * Necessary constants (fields) for handlers of tracked records
+     */
+    const TABLE_SEQ_ID      = "table_seq_id";
+    const HISTORY_TABLE_NAME= "history_table";
+    const HISTORY_FROM      = "history_from";
+    const HISTORY_TO        = "history_to";
+    const RECORD_STATUS     = "record_status";
 
     /**
      * @var array

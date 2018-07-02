@@ -8,26 +8,7 @@ use PandaBase\Connection\ConnectionManager;
 use PandaBase\Connection\Scheme\Table;
 use PandaBase\Exception\AccessDeniedException;
 
-class HistoryableRecord extends InstanceRecord {
-
-    /**
-     * @param $key
-     * @param $value
-     * @return void
-     * @throws AccessDeniedException
-     */
-    public function set($key, $value)
-    {
-        // Ha van beállítva jogosultság, akkor ellenőrizni kell
-        if(in_array(AccessibleObject::class,class_uses($this))) {
-            /** @var AccessibleObject $object */
-            $object = $this;
-            if(!ConnectionManager::getInstance()->getAccessManager()->checkWriteAccess($object)) {
-                throw new AccessDeniedException;
-            }
-        }
-        $this->values[$key] = $value;
-    }
+class TrackedRecord extends InstanceRecord {
 
     /**
      * @param Table $tableDescriptor
@@ -36,11 +17,11 @@ class HistoryableRecord extends InstanceRecord {
     public function getRecordHandler(Table $tableDescriptor = null): RecordHandler
     {
         if($tableDescriptor == null) {
-            $simpleHandler = new HistoryableRecordHandler($this->getTable());
+            $simpleHandler = new TrackedRecordHandler($this->getTable());
             $simpleHandler->setManagedRecord($this);
             return $simpleHandler;
         } else {
-            return new HistoryableRecordHandler($tableDescriptor);
+            return new TrackedRecordHandler($tableDescriptor);
         }
     }
 

@@ -18,7 +18,7 @@ class SimpleRecordTest extends TestCase
             Table::TABLE_NAME => "pp_simple_table",
             Table::TABLE_ID   => "table_id",
             Table::LAZY_ATTRIBUTES => [
-                "sub_table" => new \PandaBase\Connection\Scheme\LazyAttribute("table_id",TestClassB::class)
+                "sub_table" => new \PandaBase\Connection\Scheme\OneToOneLazyAttribute("table_id",TestClassB::class)
             ]
         ]);
 

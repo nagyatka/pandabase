@@ -80,15 +80,17 @@ class AccessManager
 
     /**
      * @param AccessibleObject $object
+     * @return bool
      */
     public function checkReadAccess(AccessibleObject $object) {
-        $this->checkAccess($object,AccessManager::TYPE_READ);
+        return $this->checkAccess($object,AccessManager::TYPE_READ);
     }
 
     /**
      * @param AccessibleObject $object
+     * @return bool
      */
     public function checkWriteAccess(AccessibleObject $object) {
-        $this->checkAccess($object,AccessManager::TYPE_WRITE);
+        return $this->checkAccess($object,AccessManager::TYPE_WRITE);
     }
 }

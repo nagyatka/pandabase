@@ -15,7 +15,7 @@ use PandaBase\Exception\DatabaseManagerNotExists;
 use PandaBase\Exception\RecordValueNotExists;
 use PandaBase\Exception\TableNotExists;
 
-class HistoryableRecordHandler extends RecordHandler{
+class TrackedRecordHandler extends RecordHandler{
 
     /**
      * Executes INSERT INTO operation and returns with the insert id.
@@ -25,11 +25,12 @@ class HistoryableRecordHandler extends RecordHandler{
     public function insert(): int
     {
         $params = $this->databaseRecord->getAll();
-        //Felesleges elemek törlése (seq_id,record_status,history,from)
+
+        //Felesleges elemek törlése (seq_id,record_status,history,from, lazy_attr)
         unset($params[$this->tableDescriptor->get(Table::TABLE_SEQ_ID)]);
-        unset($params["history_from"]);
-        unset($params["history_to"]);
-        unset($params["record_status"]);
+        unset($params[Table::HISTORY_FROM]);
+        unset($params[Table::HISTORY_TO]);
+        unset($params[Table::RECORD_STATUS]);
         foreach ($this->tableDescriptor->getAllLazyAttributeNames() as $attributeName) {
             unset($params[$attributeName]);
         }
@@ -43,7 +44,7 @@ class HistoryableRecordHandler extends RecordHandler{
         for($i = 0; $i < count($params_key); ++$i) {
             $insert_query.= "`".$params_key[$i]."`,";
         }
-        $insert_query.="record_status,history_from,history_to) VALUES (";
+        $insert_query.=  implode(", ",[Table::RECORD_STATUS, Table::HISTORY_FROM, Table::HISTORY_TO]).") VALUES (";
 
         for($i = 0; $i < count($params_key); ++$i) {
             $insert_query.= ":".$params_key[$i].",";
@@ -90,7 +91,7 @@ class HistoryableRecordHandler extends RecordHandler{
         if($id < 1) {
             return [];
         }
-        $select_query   = "SELECT * FROM"." ".$this->tableDescriptor->get(Table::TABLE_NAME)." WHERE record_status = 1 AND ".$this->tableDescriptor->get(Table::TABLE_ID)."=:".$this->tableDescriptor->get(Table::TABLE_ID);
+        $select_query   = "SELECT * FROM"." ".$this->tableDescriptor->get(Table::TABLE_NAME)." WHERE ".Table::RECORD_STATUS." = 1 AND ".$this->tableDescriptor->get(Table::TABLE_ID)."=:".$this->tableDescriptor->get(Table::TABLE_ID);
         $params         = array(
             $this->tableDescriptor->get(Table::TABLE_ID) => $id
         );
@@ -122,9 +123,21 @@ class HistoryableRecordHandler extends RecordHandler{
      */
     public function remove()
     {
-        $remove_query   = "UPDATE ".$this->tableDescriptor->get(Table::TABLE_NAME)." SET record_status = 0, history_to = NOW() WHERE ".$this->tableDescriptor->get(Table::TABLE_ID)."=:".$this->tableDescriptor->get(Table::TABLE_ID)." AND record_status=1";
+        $remove_query   = "UPDATE ".$this->tableDescriptor->get(Table::TABLE_NAME)." SET ".Table::RECORD_STATUS." = 0, ".
+            Table::HISTORY_TO." = NOW() WHERE ".$this->tableDescriptor->get(Table::TABLE_ID)."=:".
+            $this->tableDescriptor->get(Table::TABLE_ID)." AND ".Table::RECORD_STATUS."=1";
         $prepared_statement = ConnectionManager::getInstance()->getConnection()->prepare($remove_query);
         $prepared_statement->bindValue($this->tableDescriptor->get(Table::TABLE_ID),$this->databaseRecord->get($this->tableDescriptor->get(Table::TABLE_ID)));
         $prepared_statement->execute();
+    }
+
+    public function list(string $column_name, mixed $value): array
+    {
+        $select_query   = "SELECT * FROM ".$this->tableDescriptor->get(Table::TABLE_NAME)." WHERE ".Table::RECORD_STATUS." = 1 AND :column_name=:value";
+        $params         = array(
+            $column_name => $value
+        );
+        $result = ConnectionManager::getInstance()->getConnection()->fetchAll($select_query,$params);
+        return $result == false ? array() : $result;
     }
 }

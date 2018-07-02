@@ -1,46 +1,65 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: nagyatka
- * Date: 2017. 07. 25.
- * Time: 10:35
- */
 
 namespace PandaBase\Connection\Scheme;
 
-
+/**
+ * Class LazyAttribute
+ *
+ *
+ * @package PandaBase\Connection\Scheme
+ */
 class LazyAttribute
 {
-    /**
-     * @var string
-     */
-    private $foreign_key;
+    const OneToOne = 0;
+    const OneToMany= 1;
 
     /**
+     * The column name of the foreign key.
+     *
+     * @var string
+     */
+    private $key;
+
+    /**
+     * The name of the the class which represents the other object/table.
+     *
      * @var string
      */
     private $class;
 
     /**
-     * LazyAttribute constructor.
-     * @param $foreign_key
-     * @param string $class
+     * The type of the connection (OneToOne or OneToMany).
+     *
+     * @var int
      */
-    public function __construct( $foreign_key, $class)
+    private $type;
+
+    /**
+     * OneToOneLazyAttribute constructor.
+     * @param string $foreign_key
+     * @param string $class
+     * @param int $type
+     */
+    public function __construct(string $foreign_key, string $class, int $type)
     {
-        $this->foreign_key = $foreign_key;
+        $this->key = $foreign_key;
         $this->class = $class;
+        $this->type = $type;
     }
 
     /**
+     * Returns with the column name of the foreign key.
+     *
      * @return string
      */
-    public function getForeignKey(): string
+    public function getKey(): string
     {
-        return $this->foreign_key;
+        return $this->key;
     }
 
     /**
+     * Returns with the name of the other class.
+     *
      * @return string
      */
     public function getClass(): string
@@ -48,5 +67,12 @@ class LazyAttribute
         return $this->class;
     }
 
-
+    /**
+     * Returns with the type of the LazyAttribute
+     * @return int
+     */
+    public function getType(): int
+    {
+        return $this->type;
+    }
 }

@@ -17,24 +17,6 @@ use PandaBase\Exception\AccessDeniedException;
 class SimpleRecord extends InstanceRecord {
 
     /**
-     * @param $key
-     * @param $value
-     * @throws AccessDeniedException
-     */
-    public function set($key, $value)
-    {
-        // Ha van beállítva jogosultság, akkor ellenőrizni kell
-        if(in_array(AccessibleObject::class,class_uses($this))) {
-            /** @var AccessibleObject $object */
-            $object = $this;
-            if(!ConnectionManager::getInstance()->getAccessManager()->checkWriteAccess($object)) {
-                throw new AccessDeniedException;
-            }
-        }
-        $this->values[$key] = $value;
-    }
-
-    /**
      * @param Table $tableDescriptor
      * @return RecordHandler
      */

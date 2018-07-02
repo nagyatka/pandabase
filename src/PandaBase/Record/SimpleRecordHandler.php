@@ -80,6 +80,9 @@ class SimpleRecordHandler extends RecordHandler {
             $id = $this->databaseRecord->get($this->databaseRecord->getTable()->get(Table::TABLE_ID));
             $params = $this->databaseRecord->getAll();
             unset($params[$this->databaseRecord->getTable()->get(Table::TABLE_ID)]);
+            foreach ($this->tableDescriptor->getAllLazyAttributeNames() as $attributeName) {
+                unset($params[$attributeName]);
+            }
 
             $params_key =   array_keys($params);
 
@@ -120,5 +123,18 @@ class SimpleRecordHandler extends RecordHandler {
         $prepared_statement->execute();
     }
 
-
+    /**
+     * @param string $column_name
+     * @param mixed $value
+     * @return array
+     */
+    public function list(string $column_name, mixed $value): array
+    {
+        $select_query   = "SELECT * FROM ".$this->tableDescriptor->get(Table::TABLE_NAME)." WHERE :column_name=:value";
+        $params         = array(
+            $column_name => $value
+        );
+        $result = ConnectionManager::getInstance()->getConnection()->fetchAll($select_query,$params);
+        return $result == false ? array() : $result;
+    }
 }

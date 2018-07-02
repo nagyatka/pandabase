@@ -60,6 +60,13 @@ abstract class RecordHandler {
     abstract public function select(int $id);
 
     /**
+     * @param string $column_name
+     * @param mixed $value
+     * @return array
+     */
+    abstract public function list(string $column_name, mixed $value): array;
+
+    /**
      * @return mixed
      */
     abstract public function edit(): mixed;
