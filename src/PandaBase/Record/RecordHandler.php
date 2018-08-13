@@ -61,10 +61,10 @@ abstract class RecordHandler {
 
     /**
      * @param string $column_name
-     * @param mixed $value
+     * @param $value
      * @return array
      */
-    abstract public function list(string $column_name, mixed $value): array;
+    abstract public function list(string $column_name, $value): array;
 
     /**
      * @return mixed

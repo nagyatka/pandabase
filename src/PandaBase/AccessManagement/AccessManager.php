@@ -2,12 +2,7 @@
 
 namespace PandaBase\AccessManagement;
 
-/**
- * Created by PhpStorm.
- * User: nagyatka
- * Date: 2016. 08. 14.
- * Time: 11:50
- */
+
 class AccessManager
 {
     const TYPE_READ = 4;
@@ -42,7 +37,7 @@ class AccessManager
     /**
      * @return null|AuthenticatedUserInterface
      */
-    public function getAccessUser() {
+    public function getUser() {
         return $this->accessUser;
     }
 
@@ -57,20 +52,20 @@ class AccessManager
     private function checkAccess(AccessibleObject $object,$access_type) {
 
         //Ha nincs beállított user, akkor anonym hozzáférés
-        if($this->accessUser == null) {
+        if($this->getUser() == null) {
             return $object->getAccessRules(AccessManager::ANON_USER)[$access_type];
         }
 
         //Ha root, akkor mindig kap mindenre jogot
-        if ($this->accessUser->isRoot()) {
+        if ($this->getUser()->isRoot()) {
             return true;
         }
         //Ha owner
-        elseif($this->accessUser->getUserId() === $object->getOwnerId()) {
+        elseif($this->getUser()->getUserId() === $object->getOwnerId()) {
             return $object->getAccessRules(AccessManager::OWNER_USER)[$access_type];
         }
         //Ha csoport tag
-        elseif (in_array($object->getOwnerGroupId(),$this->accessUser->getGroups())) {
+        elseif (in_array($object->getOwnerGroupId(),$this->getUser()->getGroups())) {
             return $object->getAccessRules(AccessManager::GROUP_USER)[$access_type];
         }
         else {

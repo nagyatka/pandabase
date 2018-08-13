@@ -41,11 +41,11 @@ class SeparatelyTrackedRecordHandler extends RecordHandler
         return $result == false ? array() : $result;
     }
 
-    public function list(string $column_name, mixed $value): array
+    public function list(string $column_name, $value): array
     {
-        $select_query   = "SELECT * FROM ".$this->tableDescriptor->get(Table::TABLE_NAME)." WHERE :column_name=:value";
+        $select_query   = "SELECT * FROM ".$this->tableDescriptor->get(Table::TABLE_NAME)." WHERE $column_name=:value";
         $params         = array(
-            $column_name => $value
+            "value" => $value
         );
         $result = ConnectionManager::getInstance()->getConnection()->fetchAll($select_query,$params);
         return $result == false ? array() : $result;

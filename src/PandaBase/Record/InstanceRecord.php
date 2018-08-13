@@ -109,7 +109,7 @@ abstract class InstanceRecord implements \ArrayAccess {
                     $this->values[$key] = new $class($this[$lazy->getKey()]);
                     break;
                 case LazyAttribute::OneToMany:
-                    $query_result = $this->getRecordHandler()->list($lazy->getKey(), $this[Table::TABLE_ID]);
+                    $query_result = (new $class())->getRecordHandler()->list($lazy->getKey(), $this[$descriptor->get(Table::TABLE_ID)]);
                     $records = array();
                     foreach ($query_result as $result) {
                         $records[] = new $class($result);
@@ -136,11 +136,11 @@ abstract class InstanceRecord implements \ArrayAccess {
     }
 
     /**
-     * @param mixed $key
-     * @param mixed $value
+     * @param $key
+     * @param $value
      * @throws AccessDeniedException
      */
-    public function set(mixed $key, mixed $value)
+    public function set($key, $value)
     {
         // Ha van beállítva jogosultság, akkor ellenőrizni kell
         if(in_array(AccessibleObject::class,class_uses($this))) {
