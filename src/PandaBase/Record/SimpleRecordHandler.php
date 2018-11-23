@@ -73,7 +73,7 @@ class SimpleRecordHandler extends RecordHandler {
     /**
      * @return mixed
      */
-    public function edit(): mixed
+    public function edit()
     {
         if(array_key_exists($this->tableDescriptor->get(Table::TABLE_ID),$this->databaseRecord->getAll())) {
             //Ki kell szedni az id értéket, hogy az ne kerüljön bele SET részbe

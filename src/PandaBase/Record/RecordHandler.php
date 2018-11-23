@@ -69,7 +69,7 @@ abstract class RecordHandler {
     /**
      * @return mixed
      */
-    abstract public function edit(): mixed;
+    abstract public function edit();
 
     /**
      * @return void
