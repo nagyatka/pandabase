@@ -9,7 +9,7 @@
 namespace PandaBase\AccessManagement;
 
 
-interface AuthenticatedUserInterface
+interface AuthorizedUserInterface
 {
     /**
      * The user has root privileges or not?
@@ -19,16 +19,9 @@ interface AuthenticatedUserInterface
     public function isRoot();
 
     /**
-     * Returns with the unique id of the user.
-     *
-     * @return int
-     */
-    public function getUserId();
-
-    /**
-     * Returns with array of group ids of the user.
+     * Returns with array of access group ids of the user.
      *
      * @return array
      */
-    public function getGroups();
+    public function getAccessGroups();
 }

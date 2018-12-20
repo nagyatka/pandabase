@@ -10,7 +10,7 @@ namespace PandaBase\Connection;
 
 
 use PandaBase\AccessManagement\AccessManager;
-use PandaBase\AccessManagement\AuthenticatedUserInterface;
+use PandaBase\AccessManagement\AuthorizedUserInterface;
 use PandaBase\Connection\Scheme\Table;
 use PandaBase\Exception\ConnectionNotExistsException;
 use PandaBase\Exception\NotInstanceRecordException;
@@ -288,9 +288,9 @@ class ConnectionManager {
     }
 
     /**
-     * @param AuthenticatedUserInterface $accessUser
+     * @param AuthorizedUserInterface $accessUser
      */
-    public function registerAuthenticatedUser(AuthenticatedUserInterface $accessUser) {
+    public function registerAuthorizedUser(AuthorizedUserInterface $accessUser) {
         $this->accessManager->registerUser($accessUser);
     }
 

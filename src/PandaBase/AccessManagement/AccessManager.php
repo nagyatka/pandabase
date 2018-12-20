@@ -3,8 +3,11 @@
 namespace PandaBase\AccessManagement;
 
 
+use PandaBase\Exception\AccessDeniedException;
+
 class AccessManager
 {
+    const TYPE_EXEC = 8;
     const TYPE_READ = 4;
     const TYPE_WRITE= 2;
 
@@ -14,7 +17,7 @@ class AccessManager
     const ANON_USER  = "anon";
 
     /**
-     * @var null|AuthenticatedUserInterface
+     * @var null|AuthorizedUserInterface
      */
     private $accessUser;
 
@@ -27,15 +30,15 @@ class AccessManager
     }
 
     /**
-     * @param AuthenticatedUserInterface $accessUser
+     * @param AuthorizedUserInterface $accessUser
      * @return void
      */
-    public function registerUser(AuthenticatedUserInterface $accessUser) {
+    public function registerUser(AuthorizedUserInterface $accessUser) {
         $this->accessUser = $accessUser;
     }
 
     /**
-     * @return null|AuthenticatedUserInterface
+     * @return null|AuthorizedUserInterface
      */
     public function getUser() {
         return $this->accessUser;
@@ -43,34 +46,43 @@ class AccessManager
 
     /**
      *
-     * WARNING! If the registered AuthenticatedUser equals with null in AccessManager the return value is always false.
      *
      * @param AccessibleObject $object
      * @param int $access_type
      * @return bool
+     * @throws AccessDeniedException
      */
-    private function checkAccess(AccessibleObject $object,$access_type) {
+    private function checkAccess(AccessibleObject $object, $access_type) {
 
-        //Ha nincs beállított user, akkor anonym hozzáférés
         if($this->getUser() == null) {
-            return $object->getAccessRules(AccessManager::ANON_USER)[$access_type];
+            throw new AccessDeniedException("Missing Authorized user.");
         }
 
-        //Ha root, akkor mindig kap mindenre jogot
+        $authUser = $this->getUser();
+
         if ($this->getUser()->isRoot()) {
             return true;
         }
-        //Ha owner
-        elseif($this->getUser()->getUserId() === $object->getOwnerId()) {
-            return $object->getAccessRules(AccessManager::OWNER_USER)[$access_type];
+
+        $userAccessGroups = $authUser->getAccessGroups();
+
+        switch ($access_type) {
+            case AccessManager::TYPE_READ:
+                $objectAccessGroups = $object->getReadAccessGroups();
+                break;
+            case AccessManager::TYPE_WRITE:
+                $objectAccessGroups = $object->getReadAccessGroups();
+                break;
+            default:
+                throw new AccessDeniedException("Unknown access type");
         }
-        //Ha csoport tag
-        elseif (in_array($object->getOwnerGroupId(),$this->getUser()->getGroups())) {
-            return $object->getAccessRules(AccessManager::GROUP_USER)[$access_type];
+
+        foreach ($userAccessGroups as $accessGroup) {
+            if(in_array($accessGroup, $objectAccessGroups)) {
+                return true;
+            }
         }
-        else {
-            return $object->getAccessRules(AccessManager::OTHER_USER)[$access_type];
-        }
+        return false;
     }
 
     /**
