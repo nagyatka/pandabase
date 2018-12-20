@@ -29,8 +29,19 @@ abstract class InstanceRecord implements \ArrayAccess {
      * InstanceRecord constructor.
      *
      * @param integer|array $argument
+     * @throws AccessDeniedException
      */
     function __construct($argument = null) {
+
+        // Check permissions
+        if(in_array(AccessibleObject::class,class_uses($this))) {
+            /** @var AccessibleObject $object */
+            $object = $this;
+            if(!ConnectionManager::getInstance()->getAccessManager()->checkReadAccess($object)) {
+                throw new AccessDeniedException;
+            }
+        }
+
         $this->table = ConnectionManager::getTable(get_class($this));
         // If the argument contains an id, we try to load the appropriate record from the table
         if(is_int($argument) || is_numeric($argument)) {
@@ -89,14 +100,6 @@ abstract class InstanceRecord implements \ArrayAccess {
      */
     public function get(string $key)
     {
-        // Check permissions
-        if(in_array(AccessibleObject::class,class_uses($this))) {
-            /** @var AccessibleObject $object */
-            $object = $this;
-            if(!ConnectionManager::getInstance()->getAccessManager()->checkReadAccess($object)) {
-                throw new AccessDeniedException;
-            }
-        }
         // Check lazy load
         $descriptor = ConnectionManager::getTable(get_class($this));
         if($descriptor->isLazyAttribute($key) && !isset($this->values[$key])) {
@@ -142,14 +145,6 @@ abstract class InstanceRecord implements \ArrayAccess {
      */
     public function set($key, $value)
     {
-        // Ha van beállítva jogosultság, akkor ellenőrizni kell
-        if(in_array(AccessibleObject::class,class_uses($this))) {
-            /** @var AccessibleObject $object */
-            $object = $this;
-            if(!ConnectionManager::getInstance()->getAccessManager()->checkWriteAccess($object)) {
-                throw new AccessDeniedException;
-            }
-        }
         $this->values[$key] = $value;
     }
 
@@ -169,14 +164,6 @@ abstract class InstanceRecord implements \ArrayAccess {
      * @throws AccessDeniedException
      */
     public function getAll(): array {
-        // Ha van beállítva jogosultság, akkor ellenőrizni kell
-        if(in_array(AccessibleObject::class,class_uses($this))) {
-            /** @var AccessibleObject $object */
-            $object = $this;
-            if(!ConnectionManager::getInstance()->getAccessManager()->checkReadAccess($object)) {
-                throw new AccessDeniedException;
-            }
-        }
         return $this->values;
     }
 

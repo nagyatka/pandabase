@@ -9,9 +9,11 @@
 namespace PandaBase\Connection;
 
 
+use PandaBase\AccessManagement\AccessibleObject;
 use PandaBase\AccessManagement\AccessManager;
 use PandaBase\AccessManagement\AuthorizedUserInterface;
 use PandaBase\Connection\Scheme\Table;
+use PandaBase\Exception\AccessDeniedException;
 use PandaBase\Exception\ConnectionNotExistsException;
 use PandaBase\Exception\NotInstanceRecordException;
 use PandaBase\Record\InstanceRecord;
@@ -261,6 +263,15 @@ class ConnectionManager {
 
         if(!$instanceRecord instanceof InstanceRecord) {
             throw new NotInstanceRecordException(get_class($instanceRecord));
+        }
+
+        // Check permissions
+        if(in_array(AccessibleObject::class,class_uses($instanceRecord))) {
+            /** @var AccessibleObject $object */
+            $object = $instanceRecord;
+            if(!ConnectionManager::getInstance()->getAccessManager()->checkWriteAccess($object)) {
+                throw new AccessDeniedException;
+            }
         }
 
         if($instanceRecord->isNewInstance()) {
