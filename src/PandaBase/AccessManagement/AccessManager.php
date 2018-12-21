@@ -46,7 +46,7 @@ class AccessManager
      * @return bool
      * @throws AccessDeniedException
      */
-    private function checkAccess(AccessibleObject $object, $access_type) {
+    private function checkAccess($object, $access_type) {
 
         if($this->getUser() == null) {
             throw new AccessDeniedException("Missing Authorized user.");
@@ -73,7 +73,7 @@ class AccessManager
      * @param AccessibleObject $object
      * @return bool
      */
-    public function checkReadAccess(AccessibleObject $object) {
+    public function checkReadAccess($object) {
         return $this->checkAccess($object,AccessManager::TYPE_READ);
     }
 
@@ -81,7 +81,7 @@ class AccessManager
      * @param AccessibleObject $object
      * @return bool
      */
-    public function checkWriteAccess(AccessibleObject $object) {
+    public function checkWriteAccess($object) {
         return $this->checkAccess($object,AccessManager::TYPE_WRITE);
     }
 }
