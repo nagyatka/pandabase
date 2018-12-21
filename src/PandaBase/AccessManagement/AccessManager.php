@@ -71,7 +71,7 @@ class AccessManager
                 $objectAccessGroups = $object->getReadAccessGroups();
                 break;
             case AccessManager::TYPE_WRITE:
-                $objectAccessGroups = $object->getReadAccessGroups();
+                $objectAccessGroups = $object->getWriteAccessGroups();
                 break;
             default:
                 throw new AccessDeniedException("Unknown access type");
