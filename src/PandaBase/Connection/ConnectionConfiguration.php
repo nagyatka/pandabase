@@ -27,6 +27,12 @@ class ConnectionConfiguration {
     private $host;
 
     /**
+     * Host of the database.
+     * @var string
+     */
+    private $port;
+
+    /**
      * Name of the database.
      * @var string
      */
@@ -77,6 +83,7 @@ class ConnectionConfiguration {
      * @param string $dbname Name of the database
      * @param $driver string Database type. Supported drivers: mysql
      * @param $host string Host
+     * @param string $port Port number.
      * @param $name string Name of the connection.
      * @param $password string Database password
      * @param $user string Database username
@@ -84,7 +91,7 @@ class ConnectionConfiguration {
      * @param Table[] $tables
      * @throws \Exception
      */
-    private function __construct(string $dbname, string $driver, $host, $name, $password, $user, $pdoAttributes, $tables)
+    private function __construct(string $dbname, string $driver, $host, $port, $name, $password, $user, $pdoAttributes, $tables)
     {
         if(!in_array($driver,$this->supportedDrivers))
             throw new \Exception("Unsupported PDO driver. List of supported drivers:".implode(",",$this->supportedDrivers));
@@ -93,6 +100,7 @@ class ConnectionConfiguration {
         $this->driver = $driver;
         if($host=="localhost") $host = "127.0.0.1"; // To ensure that php does not use unix socket instead of tcp.
         $this->host = $host;
+        $this->port = $port;
         $this->name = $name;
         $this->password = $password;
         $this->user = $user;
@@ -107,10 +115,16 @@ class ConnectionConfiguration {
      * @return ConnectionConfiguration
      */
     public static function generateConfiguration(array $configArray) {
+
+        if(!isset($configArray["port"])) {
+            $configArray["port"] = 3306;
+        }
+
         return new ConnectionConfiguration(
             $configArray["dbname"],
             $configArray["driver"],
             $configArray["host"],
+            $configArray["port"],
             $configArray["name"],
             $configArray["password"],
             $configArray["user"],
@@ -144,6 +158,14 @@ class ConnectionConfiguration {
     public function getHost()
     {
         return $this->host;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPort(): string
+    {
+        return $this->port;
     }
 
     /**

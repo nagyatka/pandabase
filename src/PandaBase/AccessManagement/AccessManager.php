@@ -7,14 +7,8 @@ use PandaBase\Exception\AccessDeniedException;
 
 class AccessManager
 {
-    const TYPE_EXEC = 8;
     const TYPE_READ = 4;
     const TYPE_WRITE= 2;
-
-    const OWNER_USER = "owner";
-    const GROUP_USER = "group";
-    const OTHER_USER = "other";
-    const ANON_USER  = "anon";
 
     /**
      * @var null|AuthorizedUserInterface
@@ -64,25 +58,15 @@ class AccessManager
             return true;
         }
 
-        $userAccessGroups = $authUser->getAccessGroups();
-
         switch ($access_type) {
             case AccessManager::TYPE_READ:
-                $objectAccessGroups = $object->getReadAccessGroups();
-                break;
+                return $object->checkReadAccess($authUser->getUserId());
             case AccessManager::TYPE_WRITE:
-                $objectAccessGroups = $object->getWriteAccessGroups();
+                return $object->checkWriteAccess($authUser->getUserId());
                 break;
             default:
                 throw new AccessDeniedException("Unknown access type");
         }
-
-        foreach ($userAccessGroups as $accessGroup) {
-            if(in_array($accessGroup, $objectAccessGroups)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**

@@ -19,9 +19,8 @@ interface AuthorizedUserInterface
     public function isRoot();
 
     /**
-     * Returns with array of access group ids of the user.
-     *
-     * @return array
+     * User id
+     * @return mixed
      */
-    public function getAccessGroups();
+    public function getUserId();
 }

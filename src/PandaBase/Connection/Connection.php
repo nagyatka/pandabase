@@ -51,7 +51,7 @@ class Connection {
     private static function pdoDsnFactory(ConnectionConfiguration $configuration) {
         switch ($configuration->getDriver()) {
             case "mysql":
-                return 'mysql:host='.$configuration->getHost().";port=3306;dbname=".$configuration->getDbname();
+                return 'mysql:host='.$configuration->getHost().";port=".$configuration->getPort().";dbname=".$configuration->getDbname();
             case "mssql":
                 return 'sqlsrv:Server='.$configuration->getHost().';Database='.$configuration->getDbname();
             default:

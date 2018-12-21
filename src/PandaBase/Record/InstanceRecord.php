@@ -33,19 +33,19 @@ abstract class InstanceRecord implements \ArrayAccess {
      */
     function __construct($argument = null) {
 
-        // Check permissions
-        if(in_array(AccessibleObject::class,class_uses($this))) {
-            /** @var AccessibleObject $object */
-            $object = $this;
-            if(!ConnectionManager::getInstance()->getAccessManager()->checkReadAccess($object)) {
-                throw new AccessDeniedException;
-            }
-        }
-
         $this->table = ConnectionManager::getTable(get_class($this));
         // If the argument contains an id, we try to load the appropriate record from the table
         if(is_int($argument) || is_numeric($argument)) {
             $this->values = $this->getRecordHandler($this->table)->select(intval($argument));
+
+            // Check permissions after the values of the object are accessible
+            if(in_array(AccessibleObject::class,class_uses($this))) {
+                /** @var AccessibleObject $object */
+                $object = $this;
+                if(!ConnectionManager::getInstance()->getAccessManager()->checkReadAccess($object)) {
+                    throw new AccessDeniedException;
+                }
+            }
         }
         // If the argument is an array, we suppose that it contains the columns of a record from the table
         // We have to highlight if the array contains the TableDescriptor::TABLE_ID we suppose the record

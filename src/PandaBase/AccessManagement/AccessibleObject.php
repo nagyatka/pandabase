@@ -14,15 +14,17 @@ trait AccessibleObject
     /**
      * Returns with those group identifiers which have a read access to the given object.
      *
-     * @return array|null
+     * @param int $user_id
+     * @return bool
      */
-    public abstract function getReadAccessGroups(): ?array;
+    public abstract function checkReadAccess($user_id): bool;
 
     /**
      * Returns with those group identifiers which have a write access to the given object.
      *
-     * @return array|null
+     * @param int $user_id
+     * @return bool
      */
-    public abstract function getWriteAccessGroups(): ?array;
+    public abstract function checkWriteAccess($user_id): bool;
     
 }
