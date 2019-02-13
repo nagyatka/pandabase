@@ -19,8 +19,8 @@ class TrackedRecordHandler extends RecordHandler{
 
     /**
      * Executes INSERT INTO operation and returns with the insert id.
-     *
      * @return int
+     * @throws \Exception
      */
     public function insert(): int
     {
@@ -39,17 +39,42 @@ class TrackedRecordHandler extends RecordHandler{
         $containsTableId = array_key_exists($this->tableDescriptor->get(Table::TABLE_ID),$params);
         $params_key      = array_keys($params);
 
+        if(!$containsTableId) {
+            $result = ConnectionManager::getInstance()->getConnection()->fetchAssoc(
+                "SELECT IFNULL(MAX(".$this->tableDescriptor->get(Table::TABLE_ID).") + 1, 1) as next_id FROM 
+            ".$this->tableDescriptor->get(Table::TABLE_NAME).";");
+
+            if($result == false) {
+                throw new \Exception("Insert of new record is not possible he determination of next id have been failed");
+            }
+
+            $record_id = $result["next_id"];
+        }
+        else {
+            $record_id = $params[$this->tableDescriptor->get(Table::TABLE_ID)];
+        }
+
         //Lekérdezés összeállítása
         $insert_query   =   "INSERT INTO"." ".$this->tableDescriptor->get(Table::TABLE_NAME)." (";
         for($i = 0; $i < count($params_key); ++$i) {
             $insert_query.= "`".$params_key[$i]."`,";
         }
+
+        if(!$containsTableId) {
+            $insert_query.= " ".$this->tableDescriptor->get(Table::TABLE_ID).", ";
+        }
+
         $insert_query.=  implode(", ",[Table::RECORD_STATUS, Table::HISTORY_FROM, Table::HISTORY_TO]).") VALUES (";
 
         for($i = 0; $i < count($params_key); ++$i) {
             $insert_query.= ":".$params_key[$i].",";
         }
-        $insert_query   .=  "1,NOW(),'9999-12-31 00:00:00')";
+
+        if(!$containsTableId) {
+            $insert_query.= " ".$record_id.", ";
+        }
+
+        $insert_query   .=  "1, NOW(), '9999-12-31 00:00:00')";
 
 
         $prepared_statement = ConnectionManager::getInstance()->getConnection()->prepare($insert_query);
@@ -60,6 +85,8 @@ class TrackedRecordHandler extends RecordHandler{
         //Lekérdezés futtatása
         $prepared_statement->execute();
 
+        return $record_id;
+        /*
         //Ha tejesen új elem
         if(!$containsTableId) {
             $insert_id = ConnectionManager::getInstance()->getConnection()->lastInsertId();
@@ -79,6 +106,7 @@ class TrackedRecordHandler extends RecordHandler{
         else {
             return $params[$this->tableDescriptor->get(Table::TABLE_ID)];
         }
+        */
     }
 
     /**
