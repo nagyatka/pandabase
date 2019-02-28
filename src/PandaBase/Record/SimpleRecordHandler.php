@@ -59,7 +59,7 @@ class SimpleRecordHandler extends RecordHandler {
      */
     public function select(int $id)
     {
-        if($id < 1) {
+        if($id < 0) {
             return array();
         }
         $select_query   = "SELECT * FROM"." ".$this->tableDescriptor->get(Table::TABLE_NAME)." WHERE ".$this->tableDescriptor->get(Table::TABLE_ID)."=:".$this->tableDescriptor->get(Table::TABLE_ID);

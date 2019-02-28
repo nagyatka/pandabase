@@ -116,7 +116,7 @@ class TrackedRecordHandler extends RecordHandler{
      */
     public function select(int $id): array
     {
-        if($id < 1) {
+        if($id < 0) {
             return [];
         }
         $select_query   = "SELECT * FROM"." ".$this->tableDescriptor->get(Table::TABLE_NAME)." WHERE ".Table::RECORD_STATUS." = 1 AND ".$this->tableDescriptor->get(Table::TABLE_ID)."=:".$this->tableDescriptor->get(Table::TABLE_ID);
