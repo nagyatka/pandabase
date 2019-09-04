@@ -3,6 +3,8 @@
 namespace PandaBase\Connection;
 
 
+use InvalidArgumentException;
+use PandaBase\Connection\Scheme\Table;
 use PDO;
 
 /**
@@ -160,5 +162,72 @@ class Connection {
         $this->database->query("SET NAMES utf8");
     }
 
+    /**
+     * Creates all the tables which were defined in the scheme definition of the ConnectionConfiguration
+     * @param bool $forced If it is true, the tables will be created even though some of them are exist already
+     */
+    public function createTables($forced = false) {
+        $tables = $this->connectionConfiguration->getTables();
 
+        foreach ($tables as $table) {
+            $sql_parts = [];
+            $sql_parts[] = "CREATE TABLE";
+
+
+            // Table name
+            $table_name = $table->get(Table::TABLE_NAME);
+            if ($table_name == null) {
+                throw new InvalidArgumentException('One of the table name does not exist. Please 
+                check the scheme!');
+            }
+            if (!$forced) $sql_parts[] = "IF NOT EXISTS";
+            $sql_parts[] = "$table_name (";
+
+
+            // Table fields
+            $fields = $table_name->get(Table::FIELDS);
+            if ($fields == null) {
+                throw new InvalidArgumentException("Fields for table $table_name is not defined");
+            }
+            foreach ($fields as $field_name => $field_definition) {
+                $sql_parts[] = "`$field_name` $field_definition,";
+            }
+
+
+            // Primary key
+            if($table->get(Table::TABLE_SEQ_ID, null) != null) {
+                $primary_key = $table->get(Table::PRIMARY_KEY, [$table->get(Table::TABLE_SEQ_ID)]);
+            }
+            else {
+                $primary_key = $table->get(Table::PRIMARY_KEY, [$table->get(Table::TABLE_ID)]);
+            }
+            if(!is_array($primary_key)) {
+                $primary_key = [$primary_key];
+            }
+            $sql_parts[] = "PRIMARY KEY (".implode(',', $primary_key).") ,";
+
+
+            // Indexes
+            $indices =  $table->get(Table::INDEX, []);
+            $sql_parts[] = "INDEX (".implode(',', $indices).") ,";
+            $sql_parts[] = ")";
+
+
+            // Engine
+            $engine = $table->get(Table::ENGINE, 'InnoDB');
+            $sql_parts[] = "ENGINE = $engine;";
+
+            $this->database->exec(implode(' ', $sql_parts));
+
+        }
+
+    }
+
+    /**
+     * @param $new_scheme
+     * @throws \Exception
+     */
+    public function updateTables($new_scheme) {
+        throw new \Exception('Not yet implemented');
+    }
 }

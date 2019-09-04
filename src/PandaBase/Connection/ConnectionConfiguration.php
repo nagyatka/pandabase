@@ -113,6 +113,7 @@ class ConnectionConfiguration {
      *
      * @param array $configArray
      * @return ConnectionConfiguration
+     * @throws \Exception
      */
     public static function generateConfiguration(array $configArray) {
 
@@ -222,4 +223,7 @@ class ConnectionConfiguration {
         return $this->tables[$class_name];
     }
 
+    public function getTables() {
+        return $this->tables;
+    }
 } 

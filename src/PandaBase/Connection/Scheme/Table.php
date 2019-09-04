@@ -37,6 +37,15 @@ class Table {
     const HISTORY_TO        = "history_to";
     const RECORD_STATUS     = "record_status";
 
+    /*
+     * The constant is responsible for store additional information about the table
+     */
+    const FIELDS            = "fields";
+    const PRIMARY_KEY       = "primary_key";
+    const ENGINE            = "engine";
+    const INDEX             = "index";
+
+
     /**
      * @var array
      */
@@ -61,12 +70,12 @@ class Table {
      * It returns with the desired descriptor parameter if it exists. Otherwise throws TableDescriptorNotExists exception.
      *
      * @param string $descriptorKey
+     * @param mixed $default The desired value if the descriptor key is not exist
      * @return mixed
-     * @throws TableNotExists
      */
-    public function get($descriptorKey) {
+    public function get($descriptorKey, $default = null) {
         if(!array_key_exists($descriptorKey,$this->descriptor)) {
-            throw new TableNotExists("Descriptor ".$descriptorKey." not exists");
+            return $default;
         }
         return $this->descriptor[$descriptorKey];
     }
@@ -102,5 +111,21 @@ class Table {
         }
         $this->allLazyAttributeNames = array_keys($this->descriptor[Table::LAZY_ATTRIBUTES]);
         return $this->allLazyAttributeNames;
+    }
+
+    /**
+     * If the Table::FIELDS key exists in the table descriptor it returns with the array of the fields. The structure of
+     * the array is the following:
+     *
+     *  field_name => [
+     *
+     *
+     * @return array|null
+     */
+    public function getFields() {
+        if(!isset($this->descriptor[Table::FIELDS])) {
+            return null;
+        }
+        return $this->descriptor[Table::FIELDS];
     }
 } 

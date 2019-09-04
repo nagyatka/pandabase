@@ -13,7 +13,7 @@
         }
     ],
     "require": {
-        "monolog/monolog": "~1.12"
+        "ext-pdo": "*"
     },
     "autoload": {
         "psr-0": {
