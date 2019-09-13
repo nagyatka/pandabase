@@ -44,6 +44,7 @@ class Table {
     const PRIMARY_KEY       = "primary_key";
     const ENGINE            = "engine";
     const INDEX             = "index";
+    const CHARSET           = "charset";
 
 
     /**

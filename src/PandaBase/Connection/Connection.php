@@ -217,6 +217,10 @@ class Connection {
             $engine = $table->get(Table::ENGINE, 'InnoDB');
             $sql_parts[] = "ENGINE = $engine;";
 
+            // Charset
+            $charset = $table->get(Table::CHARSET, 'utf8');
+            $sql_parts[] = "DEFAULT CHARSET=$charset";
+
             $this->database->exec(implode(' ', $sql_parts));
 
         }

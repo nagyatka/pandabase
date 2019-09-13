@@ -121,6 +121,12 @@ class ConnectionConfiguration {
             $configArray["port"] = 3306;
         }
 
+        $table_descriptors = $configArray[Connection::TABLES] ?? [];
+        $tables = [];
+        foreach ($table_descriptors as $table_descriptor) {
+            $tables = new Table($table_descriptor);
+        }
+
         return new ConnectionConfiguration(
             $configArray["dbname"],
             $configArray["driver"],
@@ -130,7 +136,7 @@ class ConnectionConfiguration {
             $configArray["password"],
             $configArray["user"],
             $configArray[Connection::ATTRIBUTES] ?? [],
-            $configArray[Connection::TABLES] ?? []
+            $tables
         );
     }
 
