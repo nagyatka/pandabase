@@ -123,8 +123,8 @@ class ConnectionConfiguration {
 
         $table_descriptors = $configArray[Connection::TABLES] ?? [];
         $tables = [];
-        foreach ($table_descriptors as $table_descriptor) {
-            $tables = new Table($table_descriptor);
+        foreach ($table_descriptors as $table_name => $table_descriptor) {
+            $tables[$table_name] = new Table($table_descriptor);
         }
 
         return new ConnectionConfiguration(

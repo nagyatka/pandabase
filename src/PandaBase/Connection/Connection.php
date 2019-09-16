@@ -168,7 +168,6 @@ class Connection {
      */
     public function createTables($forced = false) {
         $tables = $this->connectionConfiguration->getTables();
-
         foreach ($tables as $table) {
             $sql_parts = [];
             $sql_parts[] = "CREATE TABLE";
@@ -185,7 +184,7 @@ class Connection {
 
 
             // Table fields
-            $fields = $table_name->get(Table::FIELDS);
+            $fields = $table->get(Table::FIELDS);
             if ($fields == null) {
                 throw new InvalidArgumentException("Fields for table $table_name is not defined");
             }
@@ -204,25 +203,25 @@ class Connection {
             if(!is_array($primary_key)) {
                 $primary_key = [$primary_key];
             }
-            $sql_parts[] = "PRIMARY KEY (".implode(',', $primary_key).") ,";
+            $sql_parts[] = "PRIMARY KEY (".implode(',', $primary_key).")";
 
 
             // Indexes
-            $indices =  $table->get(Table::INDEX, []);
-            $sql_parts[] = "INDEX (".implode(',', $indices).") ,";
+            $indices = $table->get(Table::INDEX, []);
+            if( count($indices) > 0) {
+                $sql_parts[] = ", INDEX (" . implode(',', $indices) . ") ,";
+            }
             $sql_parts[] = ")";
 
 
             // Engine
             $engine = $table->get(Table::ENGINE, 'InnoDB');
-            $sql_parts[] = "ENGINE = $engine;";
+            $sql_parts[] = "ENGINE = $engine, ";
 
             // Charset
             $charset = $table->get(Table::CHARSET, 'utf8');
-            $sql_parts[] = "DEFAULT CHARSET=$charset";
-
+            $sql_parts[] = "DEFAULT CHARSET=$charset;";
             $this->database->exec(implode(' ', $sql_parts));
-
         }
 
     }
