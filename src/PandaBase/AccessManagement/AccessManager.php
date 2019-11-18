@@ -47,6 +47,10 @@ class AccessManager
      * @throws AccessDeniedException
      */
     private function checkAccess($object, $access_type) {
+        // Access granted to command line
+        if(php_sapi_name() == 'cli') {
+            return true;
+        }
 
         if($this->getUser() == null) {
             throw new AccessDeniedException("Missing Authorized user.");
