@@ -116,6 +116,8 @@ class SimpleRecordHandler extends RecordHandler {
 
             //Lekérdezés futtatása
             $prepared_statement->execute();
+
+            $this->databaseRecord->resetChangedKeys();
             return true;
         }
         else {

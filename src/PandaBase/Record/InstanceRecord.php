@@ -176,6 +176,10 @@ abstract class InstanceRecord implements \ArrayAccess {
         return $this->changed_keys;
     }
 
+    public function resetChangedKeys() {
+        $this->changed_keys = [];
+    }
+
     /**
      * @param Table $tableDescriptor
      * @return RecordHandler
