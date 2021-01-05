@@ -21,6 +21,11 @@ abstract class InstanceRecord implements \ArrayAccess {
     protected $values;
 
     /**
+     * @var array
+     */
+    protected $changed_keys;
+
+    /**
      * @var Table
      */
     private $table;
@@ -141,11 +146,11 @@ abstract class InstanceRecord implements \ArrayAccess {
     /**
      * @param $key
      * @param $value
-     * @throws AccessDeniedException
      */
     public function set($key, $value)
     {
         $this->values[$key] = $value;
+        $this->changed_keys[] = $key;
     }
 
     /**
@@ -165,6 +170,10 @@ abstract class InstanceRecord implements \ArrayAccess {
      */
     public function getAll(): array {
         return $this->values;
+    }
+
+    public function getChangedKeys() {
+        return $this->changed_keys;
     }
 
     /**

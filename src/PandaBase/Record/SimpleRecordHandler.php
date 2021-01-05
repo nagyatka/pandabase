@@ -76,6 +76,11 @@ class SimpleRecordHandler extends RecordHandler {
     public function edit()
     {
         if(array_key_exists($this->tableDescriptor->get(Table::TABLE_ID),$this->databaseRecord->getAll())) {
+            // Ha nem változott érték akkor nem kell semmit csinálni
+            if(count($this->databaseRecord->getChangedKeys()) < 1) {
+                return true;
+            }
+
             //Ki kell szedni az id értéket, hogy az ne kerüljön bele SET részbe
             $id = $this->databaseRecord->get($this->databaseRecord->getTable()->get(Table::TABLE_ID));
             $params = $this->databaseRecord->getAll();
@@ -84,7 +89,14 @@ class SimpleRecordHandler extends RecordHandler {
                 unset($params[$attributeName]);
             }
 
-            $params_key =   array_keys($params);
+            // Leszűrünk csak azokra a mezőkre amelyek tényleg változtak
+            $filtered_params = [];
+            foreach ($this->databaseRecord->getChangedKeys() as $changedKey) {
+                $filtered_params[$changedKey] = $params[$changedKey];
+            }
+            $params = $filtered_params;
+
+            $params_key = array_keys($params);
 
             $sql = "UPDATE ".$this->databaseRecord->getTable()->get(Table::TABLE_NAME)." SET ";
             for($i = 0; $i < count($params_key); ++$i) {
@@ -95,7 +107,7 @@ class SimpleRecordHandler extends RecordHandler {
             //Visszatesszük az értéket
             $params[$this->databaseRecord->getTable()->get(Table::TABLE_ID)] = $id;
             unset($params_key);
-            $params_key =   array_keys($params);
+            $params_key = array_keys($params);
 
             $prepared_statement = ConnectionManager::getInstance()->getConnection()->prepare($sql);
             for($i = 0; $i < count($params); ++$i) {

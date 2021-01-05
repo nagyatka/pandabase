@@ -135,6 +135,10 @@ class TrackedRecordHandler extends RecordHandler{
     public function edit()
     {
         if(array_key_exists($this->tableDescriptor->get(Table::TABLE_ID),$this->databaseRecord->getAll())) {
+            // Ha nem változott érték akkor nem kell semmit csinálni
+            if(count($this->databaseRecord->getChangedKeys()) < 1) {
+                return true;
+            }
             $this->remove();
             $this->insert();
         }
