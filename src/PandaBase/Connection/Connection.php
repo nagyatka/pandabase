@@ -159,7 +159,7 @@ class Connection {
      * Set names to utf8.
      */
     public function setNamesUTF8() {
-        $this->database->query("SET NAMES utf8");
+        $this->database->query("SET NAMES utf8mb4");
     }
 
     /**
