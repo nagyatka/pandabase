@@ -140,7 +140,6 @@ class TrackedRecordHandler extends RecordHandler{
                 $this->remove();
                 $this->insert();
                 ConnectionManager::getInstance()->getConnection()->commit();
-            }
             } catch (\PDOException $e) {
                 ConnectionManager::getInstance()->getConnection()->rollBack();
                 throw new RecordValueNotExists($e->getMessage();
