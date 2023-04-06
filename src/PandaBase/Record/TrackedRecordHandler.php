@@ -135,8 +135,17 @@ class TrackedRecordHandler extends RecordHandler{
     public function edit()
     {
         if(array_key_exists($this->tableDescriptor->get(Table::TABLE_ID),$this->databaseRecord->getAll())) {
-            $this->remove();
-            $this->insert();
+            try {
+                ConnectionManager::getInstance()->getConnection()->beginTransaction();
+                $this->remove();
+                $this->insert();
+                ConnectionManager::getInstance()->getConnection()->commit();
+            }
+            } catch (\PDOException $e) {
+                ConnectionManager::getInstance()->getConnection()->rollBack();
+                throw new RecordValueNotExists($e->getMessage();
+            }
+            
         }
         else {
             throw new RecordValueNotExists("Table id not exists in array");
